@@ -65,7 +65,7 @@ def p_error(p):
     if p:
         print(f"Erro de sintaxe no token '{p.value}'")
     else:
-        print("Erro de sintaxe! Fim da entrada inesperado.")
+        print("Erro de sintaxe! Ponto e virgula inexistente")
 
 # Criar o analisador sintático
 analisador_sintatico = yacc.yacc()
@@ -75,7 +75,7 @@ entrada = input("Digite uma expressão para análise: ")
 
 # Limpeza adicional na entrada
 entrada = entrada.strip()
-print(f"\nEntrada limpa: {entrada}")
+print(f"\nEntrada: {entrada}")
 
 # Usar o lexer diretamente para ver a sequência de tokens
 analisador_lexico.input(entrada)
@@ -87,4 +87,3 @@ for token in analisador_lexico:
 resultado = analisador_sintatico.parse(entrada)
 print("\nResultado da análise sintática:")
 print(resultado)
-
