@@ -3,8 +3,9 @@ import sys
 
 # Lista de tokens reconhecidos
 tokens = [
-    'OPA', 'OPL', 'DELIMITADOR', 'LDELIMITADOR', 'RDELIMITADOR', 'ATR', 'ID', 'NUMERO', 
-    'STRINGS', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO'
+    'OPA', 'OPL', 'DELIMITADOR', 'ATR', 'ID', 'NUMERO', 
+    'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
+    'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET'
 ] + [
     'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
 ]
@@ -28,16 +29,19 @@ reserved = {
 
 # Expressões regulares simples
 t_OPA = r'(\+|\-|\*|\/|%|\*\*)'  # Operadores aritméticos
-t_OPL = r'(<|>|==|<=|=>|!=|\+=|\-=|&&|\|\|)'  # Operadores lógicos ou relacionais
-t_DELIMITADOR = r'[;,\.\:\(\)\[\]]'  # Pontuação e delimitadores
-t_LDELIMITADOR = r'\{'
-t_RDELIMITADOR = r'\}'
-t_STRINGS = r'(\"[^\"]*\"|\'[^\']*\')'  # Strings (simples ou duplas)
+t_OPL = r'(==|!=|<=|>=|<|>|\+=|\-=|&&|\|\|)'  # Operadores lógicos ou relacionais
+t_DELIMITADOR = r'[;,\.\:]'  # Pontuação e delimitadores sem parênteses, chaves e colchetes
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
+t_LCHAVE = r'\{'
+t_RCHAVE = r'\}'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+t_STRING = r'(\"[^\"]*\"|\'[^\']*\')'  # Strings (simples ou duplas)
 t_LIBIMPORT = r'\#include'  # Diretiva de importação de biblioteca
-t_DEFINE = r'\#define'  # Diretiva de importação de biblioteca
+t_DEFINE = r'\#define'  # Diretiva de definição
 t_ATR = r'='  # Atribuição
 t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'  # Comentários
-
 
 # Função para identificar identificadores e palavras reservadas
 def t_ID(t):

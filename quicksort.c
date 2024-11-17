@@ -28,7 +28,7 @@ void quicksort(int vetor[], int inicio, int fim) {
 }
 
 int main() {    
-    int vetor[TAMANHO] = {17, 1, 12, 18, 8, 9, 6, 13, 15, 3, 20, 7, 14, 4, 16, 0, 11, 19, 10, 5}
+    int vetor[TAMANHO] = {17, 1, 12, 18, 8, 9, 6, 13, 15, 3, 20, 7, 14, 4, 16, 0, 11, 19, 10, 5};
     
     printf("Vetor antes da ordenacao:\n");
     for (int i = 0; i < TAMANHO; i++) {
