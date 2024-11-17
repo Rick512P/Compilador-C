@@ -1,89 +1,90 @@
-import ply.lex as lex
 import ply.yacc as yacc
+from lexico import tokens, lexer
 
-# Definição dos tokens
-tokens = (
-    'ID',                 # Identificadores (nomes de variáveis)
-    'NUM',                # Números
-    'MAIS',               # Operador soma
-    'MENOS',              # Operador subtração
-    'MULT',               # Operador multiplicação
-    'DIV',                # Operador divisão
-    'PONTO_VIRGULA',      # Ponto e vírgula
-    'IGUAL',              # Operador de atribuição
-)
+# Definindo a gramática para a análise sintática
+def p_comandos(p):
+    '''comandos : comando comandos
+                | comando'''
+    if len(p) == 3:
+        p[0] = [p[1]] + p[2]  # Adiciona o comando à lista de comandos
+    else:
+        p[0] = [p[1]]  # Apenas um comando
 
-# Expressões regulares para os tokens
-t_ID = r'[a-zA-Z_][a-zA-Z0-9_]*'  # Identificadores
-t_NUM = r'\d+'  # Números
-t_MAIS = r'\+'
-t_MENOS = r'-'
-t_MULT = r'\*'
-t_DIV = r'/'
-t_IGUAL = r'='
-t_PONTO_VIRGULA = r';'
+def p_comando(p):
+    '''comando : expr DELIMITADOR'''
+    p[0] = ('comando', p[1])
 
-# Ignorar espaços e tabulações
-t_ignore = ' \t'
+def p_expr_atr(p):
+    '''expr : ID ATR expr DELIMITADOR'''
+    p[0] = ('atribuicao', p[1], p[3])
 
-# Função de erro para caracteres inválidos
-def t_error(t):
-    print(f"Caractere inválido: {t.value[0]}")
-    t.lexer.skip(1)
+def p_expr_binaria(p):
+    '''expr : expr OPA expr'''
+    p[0] = (p[2], p[1], p[3])
 
-# Criar o analisador léxico
-analisador_lexico = lex.lex()
+def p_expr_numero(p):
+    '''expr : NUMERO'''
+    p[0] = p[1]
 
-# Regras de precedência para operadores
-precedencia = (
-    ('left', 'MAIS', 'MENOS'),
-    ('left', 'MULT', 'DIV'),
-)
+def p_expr_id(p):
+    '''expr : ID'''
+    p[0] = p[1]
 
-# Regras de produção (gramática)
-def p_atribuicao(p):
-    '''atribuicao : ID IGUAL expressao PONTO_VIRGULA'''
-    p[0] = ('atribuicao', p[1], p[3])  # ('atribuicao', nome_da_variavel, valor)
+def p_expr_str(p):
+    '''expr : STRINGS'''
+    p[0] = p[1]
 
-def p_expressao(p):
-    '''expressao : expressao MAIS expressao
-                 | expressao MENOS expressao
-                 | expressao MULT expressao
-                 | expressao DIV expressao'''
-    p[0] = (p[2], p[1], p[3])  # ('operador', lado_esquerdo, lado_direito)
+def p_expr_booleano(p):
+    '''expr : BOOLEAN'''
+    p[0] = p[1]
 
-def p_expressao_numero(p):
-    'expressao : NUM'
-    p[0] = ('numero', int(p[1]))  # ('numero', valor)
+def p_expr_parentese(p):
+    '''expr : LDELIMITADOR expr RDELIMITADOR'''
+    p[0] = p[2]
 
-def p_expressao_id(p):
-    'expressao : ID'
-    p[0] = ('id', p[1])  # ('id', nome_da_variavel)
+def p_comando_while(p):
+    '''comando : WHILE LDELIMITADOR expr RDELIMITADOR comando'''
+    p[0] = ('while', p[3], p[5])
 
-# Função para capturar erros de sintaxe
+def p_comando_if(p):
+    '''comando : IF LDELIMITADOR expr RDELIMITADOR comando'''
+    p[0] = ('if', p[3], p[5])
+
+def p_comando_for(p):
+    '''comando : FOR LDELIMITADOR expr DELIMITADOR expr DELIMITADOR expr RDELIMITADOR comando'''
+    p[0] = ('for', p[3], p[5], p[7], p[9])
+
 def p_error(p):
     if p:
-        print(f"Erro de sintaxe no token '{p.value}'")
+        print(f"Erro sintático no token {p.type} com valor '{p.value}' na linha {p.lineno}")
     else:
-        print("Erro de sintaxe! Ponto e virgula inexistente")
+        print("Erro sintático de fim de entrada.")
 
-# Criar o analisador sintático
-analisador_sintatico = yacc.yacc()
+# Criação do analisador sintático
+parser = yacc.yacc()
 
-# Receber entrada do usuário
-entrada = input("Digite uma expressão para análise: ")
+def analisar_entrada(entrada):
+    return parser.parse(entrada)
 
-# Limpeza adicional na entrada
-entrada = entrada.strip()
-print(f"\nEntrada: {entrada}")
+def analisar_arquivo(arquivo):
+    with open(arquivo, 'r') as f:
+        content = f.read()
+        return parser.parse(content)
 
-# Usar o lexer diretamente para ver a sequência de tokens
-analisador_lexico.input(entrada)
-print("\nTokens identificados:")
-for token in analisador_lexico:
-    print(token)
+def menu():
+    arquivo = input("Digite o nome do arquivo para análise: ").strip()
+    print("\nAnálise léxica e sintática do arquivo:")
+    with open(arquivo, 'r') as f:
+        conteudo = f.read()
+        lexer.input(conteudo)
+        while True:
+            tok = lexer.token()
+            if not tok:
+                break
+            print(tok)
+        print("\nAnálise sintática:")
+        resultado = analisar_arquivo(arquivo)
+        print("Resultado da análise sintática:", resultado)
 
-# Analisar a entrada e gerar a árvore de sintaxe abstrata
-resultado = analisador_sintatico.parse(entrada)
-print("\nResultado da análise sintática:")
-print(resultado)
+if __name__ == "__main__":
+    menu()

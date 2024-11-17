@@ -1,58 +1,79 @@
-# Importa a biblioteca Ply para criação do analisador léxico
 import ply.lex as lex
-# Importa a biblioteca sys para manipular argumentos da linha de comando
 import sys
 
-# Lista de tokens reconhecidos pelo analisador léxico
+# Lista de tokens reconhecidos
 tokens = [
-    'OPA', 'OPL', 'DELIMITADOR', 'ATR', 'ESPACO', 'TAB', 'NEWLINE', 
-    'CARRIAGE_RETURN', 'ID', 'NUMERO', 'TIPO', 'IF', 'ELSE', 'SWITCH', 
-    'CASE', 'WHILE', 'DO', 'FOR', 'COMENTARIO', 'STRINGS', 'LIBIMPORT'
+    'OPA', 'OPL', 'DELIMITADOR', 'LDELIMITADOR', 'RDELIMITADOR', 'ATR', 'ID', 'NUMERO', 
+    'STRINGS', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO'
+] + [
+    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
 ]
 
-# Expressões regulares para os tokens
-t_OPA = r'(\+|\-|\*|\/|%|\*\*)'
-t_OPL = r'(<|>|==|<=|=>|!=|\+=|\-=|&&|\|\|)'
-t_DELIMITADOR = r'[;,\.\:\(\)\{\}\[\]]'
-t_STRINGS = r'(\"[^\"]*\"|\'[^\']*\')'
-t_LIBIMPORT = r'\#'
-t_ATR = r'='
-t_IF = r'if'
-t_ELSE = r'else'
-t_SWITCH = r'switch'
-t_CASE = r'case'
-t_WHILE = r'while'
-t_DO = r'do'
-t_FOR = r'for'
-t_TIPO = r'(int|float|double|char|void)'
-t_ESPACO = r'\s+'
-t_TAB = r'\t'
-t_NEWLINE = r'\n'
-t_CARRIAGE_RETURN = r'\r'
-t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'
+# Palavras reservadas
+reserved = {
+    'if': 'IF',
+    'else': 'ELSE',
+    'switch': 'SWITCH',
+    'case': 'CASE',
+    'while': 'WHILE',
+    'do': 'DO',
+    'for': 'FOR',
+    'int': 'TIPO',
+    'float': 'TIPO',
+    'double': 'TIPO',
+    'char': 'TIPO',
+    'void': 'TIPO',
+    'boolean': 'BOOLEAN'
+}
 
-# Função que identifica identificadores
+# Expressões regulares simples
+t_OPA = r'(\+|\-|\*|\/|%|\*\*)'  # Operadores aritméticos
+t_OPL = r'(<|>|==|<=|=>|!=|\+=|\-=|&&|\|\|)'  # Operadores lógicos ou relacionais
+t_DELIMITADOR = r'[;,\.\:\(\)\[\]]'  # Pontuação e delimitadores
+t_LDELIMITADOR = r'\{'
+t_RDELIMITADOR = r'\}'
+t_STRINGS = r'(\"[^\"]*\"|\'[^\']*\')'  # Strings (simples ou duplas)
+t_LIBIMPORT = r'\#include'  # Diretiva de importação de biblioteca
+t_DEFINE = r'\#define'  # Diretiva de importação de biblioteca
+t_ATR = r'='  # Atribuição
+t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'  # Comentários
+
+
+# Função para identificar identificadores e palavras reservadas
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID')  # Verifica se é uma palavra reservada
     return t
 
-# Função que identifica números inteiros
+# Função para identificar números inteiros
 def t_NUMERO(t):
-    r'\d+'
+    r'\d+'  # Números inteiros
     t.value = int(t.value)
     return t
 
-# Função que rastreia o número de linhas ao encontrar novas linhas
+# Função para identificar valores booleanos
+def t_BOOLEAN(t):
+    r'\b(true|false)\b'  # "true" ou "false"
+    t.value = t.value == 'true'
+    return t
+
+# Função para identificar caracteres (single character)
+def t_CHAR(t):
+    r'\'[^\']\''  # Caracter (como 'a', '1', etc.)
+    t.value = t.value[1]  # Remover as aspas simples
+    return t
+
+# Função para rastrear número de linhas
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-# Ignora espaços e tabulações
+# Ignorar espaços e tabulações
 t_ignore = ' \t'
 
-# Função que trata erros léxicos
+# Função para tratar erros
 def t_error(t):
-    print(f"Caractere ilegal: {t.value[0]}")
+    print(f"Caractere ilegal: {t.value[0]} na linha {t.lineno}")
     t.lexer.skip(1)
 
 # Constrói o analisador léxico
@@ -62,31 +83,27 @@ lexer = lex.lex()
 def lexer_analyze(file_content):
     lexer.input(file_content)
     print("Análise léxica iniciada")
-    print("| Linha | Token                            |")
-    print("|-------|----------------------------------|")
+    print("| Linha | Token       | Valor                     |")
+    print("|-------|-------------|---------------------------|")
 
     while True:
         tok = lexer.token()
         if not tok:
             break
-        if tok.type == "NUMERO_INTEIRO" or tok.type == "IDENTIFICADOR":
-            print(f"| Linha {tok.lineno} | Token: {tok.type} ({tok.value})")
-        else:
-            print(f"| Linha {tok.lineno} | Token: {tok.type}")
+        print(f"| {tok.lineno:<5} | {tok.type:<11} | {str(tok.value):<25} |")
 
-    print("|-------|----------------------------------|")
+    print("|-------|-------------|---------------------------|")
 
-# Verifica se foi passado um argumento (nome do arquivo) na linha de comando
-if len(sys.argv) > 1:
-    try:
-        with open(sys.argv[1], "r") as file:
-            file_content = file.read()
-    except FileNotFoundError:
-        print("Erro ao abrir o arquivo")
-        sys.exit(1)
-else:
-    print("Por favor, forneça um arquivo de entrada.")
-    sys.exit(1)
-
-# Chama a função de análise léxica com o conteúdo do arquivo
-lexer_analyze(file_content)
+# Esta parte será executada apenas se o lexico.py for executado diretamente, 
+# não será executada quando for importado.
+if __name__ == "__main__":
+    # Verifica se foi passado um argumento (nome do arquivo) na linha de comando
+    if len(sys.argv) > 1:
+        try:
+            with open(sys.argv[1], "r") as file:
+                file_content = file.read()
+                lexer_analyze(file_content)  # Passa o conteúdo completo para o lexer
+        except FileNotFoundError:
+            print("Erro ao abrir o arquivo")
+    else:
+        print("Por favor, forneça um arquivo de entrada.")
