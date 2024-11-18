@@ -1,2 +1,7 @@
-x = 1 + 2;
-y = 2 + 1;
+#define TAMANHO 10
+
+int main() {
+    int x;
+    x = 1 + TAMANHO;
+    return 0;
+}

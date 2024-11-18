@@ -29,7 +29,7 @@ Rule 6     declaracao -> declaracao_preprocessador
 Rule 7     declaracao -> atribuicao
 Rule 8     declaracao_variaveis -> tipo lista_variaveis ;
 Rule 9     declaracao_funcao -> tipo ID ( parametros ) bloco
-Rule 10    declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL
+Rule 10    declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE
 Rule 11    declaracao_preprocessador -> DEFINE ID NUMERO
 Rule 12    tipo -> TIPO
 Rule 13    lista_variaveis -> lista_variaveis , ID
@@ -67,7 +67,7 @@ BOOLEAN              :
 CASE                 : 
 CHAR                 : 
 COMENTARIO           : 
-DEFINE               : 11
+DEFINE               : 10 11
 DELIMITADOR          : 10 26
 DO                   : 
 ELSE                 : 
@@ -127,7 +127,7 @@ state 0
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis ;
     (9) declaracao_funcao -> . tipo ID ( parametros ) bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT ID OPL ID DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> . LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE
     (11) declaracao_preprocessador -> . DEFINE ID NUMERO
     (26) atribuicao -> . ID ATR expressao DELIMITADOR
     (12) tipo -> . TIPO
@@ -162,7 +162,7 @@ state 2
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis ;
     (9) declaracao_funcao -> . tipo ID ( parametros ) bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT ID OPL ID DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> . LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE
     (11) declaracao_preprocessador -> . DEFINE ID NUMERO
     (26) atribuicao -> . ID ATR expressao DELIMITADOR
     (12) tipo -> . TIPO
@@ -255,7 +255,7 @@ state 9
 
 state 10
 
-    (10) declaracao_preprocessador -> LIBIMPORT . ID OPL ID DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> LIBIMPORT . ID OPL ID DELIMITADOR ID OPL DEFINE
 
     ID              shift and go to state 17
 
@@ -321,7 +321,7 @@ state 16
 
 state 17
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID . OPL ID DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> LIBIMPORT ID . OPL ID DELIMITADOR ID OPL DEFINE
 
     OPL             shift and go to state 26
 
@@ -419,7 +419,7 @@ state 25
 
 state 26
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID OPL . ID DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL . ID DELIMITADOR ID OPL DEFINE
 
     ID              shift and go to state 37
 
@@ -535,7 +535,7 @@ state 36
 
 state 37
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID . DELIMITADOR ID OPL
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID . DELIMITADOR ID OPL DEFINE
 
     DELIMITADOR     shift and go to state 44
 
@@ -615,7 +615,7 @@ state 43
 
 state 44
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR . ID OPL
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR . ID OPL DEFINE
 
     ID              shift and go to state 48
 
@@ -668,7 +668,7 @@ state 47
 
 state 48
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID . OPL
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID . OPL DEFINE
 
     OPL             shift and go to state 59
 
@@ -791,13 +791,9 @@ state 58
 
 state 59
 
-    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL . DEFINE
 
-    LIBIMPORT       reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .)
-    DEFINE          reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .)
-    ID              reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .)
-    TIPO            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .)
-    $end            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL .)
+    DEFINE          shift and go to state 65
 
 
 state 60
@@ -841,7 +837,7 @@ state 62
     NUMERO          shift and go to state 24
     (               shift and go to state 25
 
-    expressao                      shift and go to state 65
+    expressao                      shift and go to state 66
 
 state 63
 
@@ -850,7 +846,7 @@ state 63
 
     ID              shift and go to state 9
 
-    atribuicao                     shift and go to state 66
+    atribuicao                     shift and go to state 67
 
 state 64
 
@@ -865,20 +861,31 @@ state 64
     NUMERO          shift and go to state 24
     (               shift and go to state 25
 
-    expressao                      shift and go to state 67
+    expressao                      shift and go to state 68
 
 state 65
+
+    (10) declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .
+
+    LIBIMPORT       reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .)
+    DEFINE          reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .)
+    ID              reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .)
+    TIPO            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .)
+    $end            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE .)
+
+
+state 66
 
     (27) comando_condicional -> IF ( expressao . ) bloco
     (30) expressao -> expressao . OPL expressao
     (31) expressao -> expressao . OPA expressao
 
-    )               shift and go to state 68
+    )               shift and go to state 69
     OPL             shift and go to state 34
     OPA             shift and go to state 35
 
 
-state 66
+state 67
 
     (28) comando_loop -> FOR ( atribuicao . expressao ; atribuicao ) bloco
     (30) expressao -> . expressao OPL expressao
@@ -891,49 +898,49 @@ state 66
     NUMERO          shift and go to state 24
     (               shift and go to state 25
 
-    expressao                      shift and go to state 69
+    expressao                      shift and go to state 70
 
-state 67
+state 68
 
     (29) comando_loop -> WHILE ( expressao . ) bloco
     (30) expressao -> expressao . OPL expressao
     (31) expressao -> expressao . OPA expressao
 
-    )               shift and go to state 70
+    )               shift and go to state 71
     OPL             shift and go to state 34
     OPA             shift and go to state 35
 
 
-state 68
+state 69
 
     (27) comando_condicional -> IF ( expressao ) . bloco
     (19) bloco -> . { lista_comandos }
 
     {               shift and go to state 46
 
-    bloco                          shift and go to state 71
+    bloco                          shift and go to state 72
 
-state 69
+state 70
 
     (28) comando_loop -> FOR ( atribuicao expressao . ; atribuicao ) bloco
     (30) expressao -> expressao . OPL expressao
     (31) expressao -> expressao . OPA expressao
 
-    ;               shift and go to state 72
+    ;               shift and go to state 73
     OPL             shift and go to state 34
     OPA             shift and go to state 35
 
 
-state 70
+state 71
 
     (29) comando_loop -> WHILE ( expressao ) . bloco
     (19) bloco -> . { lista_comandos }
 
     {               shift and go to state 46
 
-    bloco                          shift and go to state 73
+    bloco                          shift and go to state 74
 
-state 71
+state 72
 
     (27) comando_condicional -> IF ( expressao ) bloco .
 
@@ -945,16 +952,16 @@ state 71
     {               reduce using rule 27 (comando_condicional -> IF ( expressao ) bloco .)
 
 
-state 72
+state 73
 
     (28) comando_loop -> FOR ( atribuicao expressao ; . atribuicao ) bloco
     (26) atribuicao -> . ID ATR expressao DELIMITADOR
 
     ID              shift and go to state 9
 
-    atribuicao                     shift and go to state 74
+    atribuicao                     shift and go to state 75
 
-state 73
+state 74
 
     (29) comando_loop -> WHILE ( expressao ) bloco .
 
@@ -966,23 +973,23 @@ state 73
     {               reduce using rule 29 (comando_loop -> WHILE ( expressao ) bloco .)
 
 
-state 74
+state 75
 
     (28) comando_loop -> FOR ( atribuicao expressao ; atribuicao . ) bloco
 
-    )               shift and go to state 75
+    )               shift and go to state 76
 
 
-state 75
+state 76
 
     (28) comando_loop -> FOR ( atribuicao expressao ; atribuicao ) . bloco
     (19) bloco -> . { lista_comandos }
 
     {               shift and go to state 46
 
-    bloco                          shift and go to state 76
+    bloco                          shift and go to state 77
 
-state 76
+state 77
 
     (28) comando_loop -> FOR ( atribuicao expressao ; atribuicao ) bloco .
 

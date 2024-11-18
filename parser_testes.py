@@ -1,3 +1,4 @@
+import re
 import ply.yacc as yacc
 from lexico import tokens, lexer
 
@@ -36,15 +37,36 @@ def p_declaracao_variaveis(p):
 def p_declaracao_funcao(p):
     """declaracao_funcao : tipo ID '(' parametros ')' bloco"""
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
+    
+
 
 # Declarações de diretivas de pré-processador (como #include, #define)
 def p_declaracao_preprocessador(p):
-    """declaracao_preprocessador : LIBIMPORT ID OPL ID DELIMITADOR ID OPL
+    """declaracao_preprocessador : LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE
                                   | DEFINE ID NUMERO"""
     if len(p) == 6:
-        p[0] = ('include', p[3], p[5])
+        p[0] = ('#include', p[3], p[5])
     else:
-        p[0] = ('define', p[2], p[3])
+        p[0] = ('#define', p[2], p[3])
+        
+
+def preprocess_code(code):
+    # Dicionário para armazenar macros
+    defines = {}
+    # Encontrar todas as definições de macros
+    for line in code.splitlines():
+        match = re.match(r'#define\s+(\w+)\s+(\d+)', line)
+        if match:
+            defines[match.group(1)] = match.group(2)
+    # Substituir macros por seus valores no código
+    for macro, value in defines.items():
+        code = re.sub(rf'\b{macro}\b', value, code)
+    # Remover diretivas #define do código após substituição
+    code = re.sub(r'#define\s+\w+\s+\d+', '', code)
+    return code
+
+
+
 
 # Tipo de dados - int, void, etc.
 def p_tipo(p):
@@ -105,6 +127,8 @@ def p_comando(p):
 def p_atribuicao(p):
     """atribuicao : ID ATR expressao DELIMITADOR"""
     p[0] = ('assign', p[1], p[3])
+    
+
 
 # Comando condicional - if (expressao) { comando }
 def p_comando_condicional(p):
@@ -139,6 +163,7 @@ def p_expressao(p):
     else:
         p[0] = p[2]
 
+
 # Regra de vazio - para produção de árvores vazias
 def p_vazio(p):
     """vazio : """
@@ -156,6 +181,7 @@ analisador_sintatico = yacc.yacc()
 
 # Função para analisar a entrada e gerar a árvore de sintaxe abstrata
 def analisar_entrada(entrada):
+    entrada = preprocess_code(entrada)
     # Exibir tokens identificados (usando o lexer do lexico.py)
     print("\nTokens identificados:")
     lexer.input(entrada)
