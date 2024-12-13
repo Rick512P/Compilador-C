@@ -137,7 +137,8 @@ def p_comando(p):
     """comando : atribuicao
                | comando_condicional
                | comando_loop
-               | bloco"""
+               | bloco
+               | declaracao_variaveis"""  # Agora aceita declarações dentro do bloco
     p[0] = p[1]
 
 def p_atribuicao(p):
@@ -146,6 +147,8 @@ def p_atribuicao(p):
 
 def p_comando_condicional(p):
     """comando_condicional : IF LPAREN expressao RPAREN bloco"""
+    print(f"Condição do IF: {p[3]}")
+    print(f"Bloco do IF: {p[5]}")
     p[0] = ('if', p[3], p[5])
 
 def p_comando_loop(p):
@@ -215,7 +218,7 @@ def main():
         analisar_entrada(entrada)
     elif opcao == 'A':
         #arquivo = input("Digite o caminho do arquivo: ").strip()
-        arquivo = "q.c"
+        arquivo = "basico.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()
