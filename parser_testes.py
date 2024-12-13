@@ -206,3 +206,26 @@ def analisar_entrada(entrada):
     else:
         print("\nErro na geração da árvore.")
         return None
+
+def main():
+    #opcao = input("Deseja fornecer uma expressão (E) ou um arquivo (A)? ").strip().upper()
+    opcao = "A"
+    if opcao == 'E':
+        entrada = input("Digite uma expressão para análise: ").strip()
+        analisar_entrada(entrada)
+    elif opcao == 'A':
+        #arquivo = input("Digite o caminho do arquivo: ").strip()
+        arquivo = "q.c"
+        try:
+            with open(arquivo, 'r') as file:
+                conteudo = file.read().strip()
+                analisar_entrada(conteudo)
+        except FileNotFoundError:
+            print(f"Erro: O arquivo '{arquivo}' não foi encontrado.")
+        except Exception as e:
+            print(f"Erro ao ler o arquivo: {e}")
+    else:
+        print("Opção inválida. Por favor, escolha 'E' para expressão ou 'A' para arquivo.")
+
+if __name__ == "__main__":
+    main()

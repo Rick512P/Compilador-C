@@ -8,6 +8,10 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
     """
     if isinstance(no, tuple):
         instrucao = None
+        print(f"Processando nó: {no}")
+        if no[0] == 'program':
+            for comando in no[1]:  # Itera sobre as instruções do programa
+                gerar_codigo_intermediario(comando, codigo_intermediario)
         if no[0] == 'assign':
             gerar_codigo_intermediario(no[2], codigo_intermediario)  # Gera código para a expressão
             instrucao = ('store', no[1])
