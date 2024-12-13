@@ -1,11 +1,90 @@
 import re
+import ply.lex as lex
 import ply.yacc as yacc
-from lexico import tokens, lexer
 
+# Lista de tokens reconhecidos
+tokens = [
+    'OPA', 'OPL', 'DELIMITADOR', 'ATR', 'ID', 'NUMERO', 
+    'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
+    'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET'
+] + [
+    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
+]
+
+# Palavras reservadas
+reserved = {
+    'if': 'IF',
+    'else': 'ELSE',
+    'switch': 'SWITCH',
+    'case': 'CASE',
+    'while': 'WHILE',
+    'do': 'DO',
+    'for': 'FOR',
+    'int': 'TIPO',
+    'float': 'TIPO',
+    'double': 'TIPO',
+    'char': 'TIPO',
+    'void': 'TIPO',
+    'boolean': 'BOOLEAN'
+}
+
+# Expressões regulares simples
+t_OPA = r'(\+|\-|\*|\/|%|\*\*)'  # Operadores aritméticos
+t_OPL = r'(==|!=|<=|>=|<|>|\+=|\-=|&&|\|\|)'  # Operadores lógicos ou relacionais
+t_DELIMITADOR = r'[;,\.\:]'  # Pontuação e delimitadores sem parênteses, chaves e colchetes
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
+t_LCHAVE = r'\{'
+t_RCHAVE = r'\}'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+t_STRING = r'(\"[^\"]*\"|\'[^\']*\')'  # Strings (simples ou duplas)
+t_LIBIMPORT = r'\#include'  # Diretiva de importação de biblioteca
+t_DEFINE = r'\#define'  # Diretiva de definição
+t_ATR = r'='  # Atribuição
+t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'  # Comentários
+
+# Função para identificar identificadores e palavras reservadas
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID')  # Verifica se é uma palavra reservada
+    return t
+
+# Função para identificar números inteiros
+def t_NUMERO(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
+
+# Função para identificar valores booleanos
+def t_BOOLEAN(t):
+    r'\b(true|false)\b'
+    t.value = t.value == 'true'
+    return t
+
+# Função para identificar caracteres (single character)
+def t_CHAR(t):
+    r'\'[^\']\''
+    t.value = t.value[1]  # Remover as aspas simples
+    return t
+
+# Função para rastrear número de linhas
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+# Ignorar espaços e tabulações
+t_ignore = ' \t'
+
+# Função para tratar erros
+def t_error(t):
+    print(f"Caractere ilegal: {t.value[0]} na linha {t.lineno}")
+    t.lexer.skip(1)
+
+# Constrói o analisador léxico
+lexer = lex.lex()
 
 # Regras da gramática
-
-# Programa inicial - ponto de entrada
 
 def p_programa(p):
     """programa : lista_declaracoes"""
@@ -38,50 +117,26 @@ def p_declaracao_funcao(p):
     """declaracao_funcao : tipo ID '(' parametros ')' bloco"""
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
 
-# Declarações de diretivas de pré-processador (como #include, #define)
+# Declarações de diretivas de pré-processador
+
 def p_declaracao_preprocessador(p):
-    """declaracao_preprocessador : LIBIMPORT ID OPL ID DELIMITADOR ID OPL DEFINE
-                                  | DEFINE ID NUMERO"""
-    if len(p) == 6:
-        p[0] = ('include', p[3], p[5])
-    else:
-        p[0] = ('define', p[2], p[3])
-        
-        
+    """declaracao_preprocessador : LIBIMPORT '<' ID '.' ID '>'"""
+    p[0] = ('include', f"{p[3]}.{p[5]}")
 
 
-def preprocess_code(code):
-    # Dicionário para armazenar macros
-    defines = {}
-    # Encontrar todas as definições de macros
-    for line in code.splitlines():
-        match = re.match(r'#define\s+(\w+)\s+(\d+)', line)
-        if match:
-            defines[match.group(1)] = match.group(2)
-    # Substituir macros por seus valores
-    for macro, value in defines.items():
-        code = re.sub(rf'\b{macro}\b', value, code)
-    # Remover diretivas #define do código após substituição
-    code = re.sub(r'#define\s+\w+\s+\d+', '', code)
-    return code
-
-
-
-# Tipo de dados - int, void, etc.
+# Tipo de dados
 def p_tipo(p):
     """tipo : TIPO"""
     p[0] = p[1]
 
-# Lista de variáveis a serem declaradas
+# Lista de variáveis
 def p_lista_variaveis(p):
     """lista_variaveis : lista_variaveis ',' ID
                         | ID"""
     if len(p) == 4:
-        p[0] = ('array', p[1], p[3])
-    elif len(p) == 2:
-        p[0] = p[1]
-    else:
         p[0] = p[1] + [p[3]]
+    else:
+        p[0] = [p[1]]
 
 # Lista de parâmetros para funções
 def p_parametros(p):
@@ -97,13 +152,10 @@ def p_lista_parametros(p):
     else:
         p[0] = [(p[1], p[2])]
 
-# Bloco de comandos - definido por chaves ({})
+# Bloco de comandos
 def p_bloco(p):
     """bloco : '{' lista_comandos '}'"""
-    if len(p) == 3:
-        p[0] = []
-    else:
-        p[0] = p[2]
+    p[0] = p[2]
 
 # Lista de comandos
 def p_lista_comandos(p):
@@ -114,7 +166,7 @@ def p_lista_comandos(p):
     else:
         p[0] = [p[1]]
 
-# Definição de comandos - inclui estruturas de controle, atribuição, etc.
+# Definição de comandos
 def p_comando(p):
     """comando : atribuicao
                | comando_condicional
@@ -122,29 +174,24 @@ def p_comando(p):
                | bloco"""
     p[0] = p[1]
 
-# Atribuições, exemplo: a = b + 1
+# Atribuições
 def p_atribuicao(p):
     """atribuicao : ID ATR expressao DELIMITADOR"""
     p[0] = ('assign', p[1], p[3])
 
-# Comando condicional - if (expressao) { comando }
+# Comando condicional
 def p_comando_condicional(p):
     """comando_condicional : IF '(' expressao ')' bloco"""
-    if len(p) == 6:
-        p[0] = ('if', p[3], p[5])
-    else:
-        p[0] = ('if_else', p[3], p[5], p[7])
+    p[0] = ('if', p[3], p[5])
 
-# Comando de loop - for, while
+# Comando de loop
 def p_comando_loop(p):
     """comando_loop : FOR '(' atribuicao expressao ';' atribuicao ')' bloco
                     | WHILE '(' expressao ')' bloco"""
     if p[1] == 'for':
         p[0] = ('for', p[3], p[4], p[6], p[8])
-    elif p[1] == 'while':
-        p[0] = ('while', p[3], p[5])
     else:
-        p[0] = ('do_while', p[2], p[5])
+        p[0] = ('while', p[3], p[5])
 
 # Definição de expressões
 def p_expressao(p):
@@ -160,7 +207,7 @@ def p_expressao(p):
     else:
         p[0] = p[2]
 
-# Regra de vazio - para produção de árvores vazias
+# Regra de vazio
 def p_vazio(p):
     """vazio : """
     p[0] = []
@@ -175,37 +222,40 @@ def p_error(p):
 # Criar o analisador sintático
 analisador_sintatico = yacc.yacc()
 
-# Função para analisar a entrada e gerar a árvore de sintaxe abstrata
+def preprocess_code(code):
+    defines = {}
+    for line in code.splitlines():
+        match = re.match(r'#define\s+(\w+)\s+(\d+)', line)
+        if match:
+            defines[match.group(1)] = match.group(2)
+    for macro, value in defines.items():
+        code = re.sub(rf'\b{macro}\b', value, code)
+    code = re.sub(r'#define\s+\w+\s+\d+', '', code)
+    return code
+
 def analisar_entrada(entrada):
     entrada = preprocess_code(entrada)
-    # Exibir tokens identificados (usando o lexer do lexico.py)
-    print("\nTokens identificados:")
     lexer.input(entrada)
-    
-    # Analisar o arquivo completo
-    tok = lexer.token()  # Obter o primeiro token
+    print("\nTokens identificados:")
+    tok = lexer.token()
     while tok:
-        print(tok)  # Exibir token
-        tok = lexer.token()  # Obter o próximo token
+        print(tok)
+        tok = lexer.token()
 
-    # Analisar a entrada e gerar a árvore de sintaxe abstrata
     print("\nAnálise sintática:")
     resultado = analisador_sintatico.parse(entrada, lexer=lexer)
     print("\nResultado da análise sintática:")
     print(resultado)
 
-# Função principal
 def main():
-    # Perguntar se o usuário deseja fornecer uma expressão ou um arquivo
-    opcao = input("Deseja fornecer uma expressão (E) ou um arquivo (A)? ").strip().upper()
-
-    if opcao == 'E':  # Análise de uma expressão fornecida pelo usuário
+    #opcao = input("Deseja fornecer uma expressão (E) ou um arquivo (A)? ").strip().upper()
+    opcao = "A"
+    if opcao == 'E':
         entrada = input("Digite uma expressão para análise: ").strip()
         analisar_entrada(entrada)
-    
-    elif opcao == 'A':  # Análise de um arquivo fornecido pelo usuário
-        arquivo = input("Digite o caminho do arquivo: ").strip()
-        
+    elif opcao == 'A':
+        #arquivo = input("Digite o caminho do arquivo: ").strip()
+        arquivo = "q.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()
@@ -214,7 +264,6 @@ def main():
             print(f"Erro: O arquivo '{arquivo}' não foi encontrado.")
         except Exception as e:
             print(f"Erro ao ler o arquivo: {e}")
-    
     else:
         print("Opção inválida. Por favor, escolha 'E' para expressão ou 'A' para arquivo.")
 
