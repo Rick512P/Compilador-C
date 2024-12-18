@@ -1,5 +1,5 @@
 import os
-from parser import analisar_entrada
+from parser_testes import analisar_entrada
 
 def gerar_codigo_intermediario(no, codigo_intermediario):
     """
@@ -223,7 +223,7 @@ def main():
     Função principal que lê o arquivo C, gera a árvore sintática
     e traduz para assembly MIPS, salvando o resultado em um arquivo .asm.
     """
-    entrada_c = 'basico.c'
+    entrada_c = 't.c'
     try:
         with open(entrada_c, 'r') as file:
             entrada = file.read()  # Lê o código-fonte

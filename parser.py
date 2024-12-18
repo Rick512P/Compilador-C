@@ -7,9 +7,9 @@ tokens = [
     'OPA', 'OPL', 'DELIMITADOR', 'ATR', 'ID', 'NUMERO', 
     'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
     'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET'
-] + [
+] + list({
     'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
-]
+})
 
 # Palavras reservadas
 reserved = {
@@ -28,78 +28,64 @@ reserved = {
     'boolean': 'BOOLEAN'
 }
 
+def merge_dicts(d1, d2):
+    return {**d1, **d2}
+
+tokens = list(merge_dicts(reserved, {t: t for t in tokens}).values())
+
 # Expressões regulares simples
 t_OPA = r'(\+|\-|\*|\/|%|\*\*)'  # Operadores aritméticos
 t_OPL = r'(==|!=|<=|>=|<|>|\+=|\-=|&&|\|\|)'  # Operadores lógicos ou relacionais
-t_DELIMITADOR = r'[;,\.\:]'  # Pontuação e delimitadores sem parênteses, chaves e colchetes
+t_DELIMITADOR = r'[;,\.:]'  # Pontuação e delimitadores sem parênteses, chaves e colchetes
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_LCHAVE = r'\{'
 t_RCHAVE = r'\}'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
-t_STRING = r'(\"[^\"]*\"|\'[^\']*\')'  # Strings (simples ou duplas)
+t_STRING = r'"(\\.|[^"\\])*"|\'(\\.|[^\'\\])*\''  # Strings (simples ou duplas)
 t_LIBIMPORT = r'\#include'  # Diretiva de importação de biblioteca
 t_DEFINE = r'\#define'  # Diretiva de definição
 t_ATR = r'='  # Atribuição
 t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'  # Comentários
 
-# Função para identificar identificadores e palavras reservadas
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'ID')  # Verifica se é uma palavra reservada
     return t
 
-# Função para identificar números inteiros
 def t_NUMERO(t):
-    r'\d+'
-    t.value = int(t.value)
+    r'\d+(\.\d+)?'
+    t.value = float(t.value) if '.' in t.value else int(t.value)
     return t
 
-# Função para identificar valores booleanos
-def t_BOOLEAN(t):
-    r'\b(true|false)\b'
-    t.value = t.value == 'true'
-    return t
-
-# Função para identificar caracteres (single character)
 def t_CHAR(t):
-    r'\'[^\']\''
-    t.value = t.value[1]  # Remover as aspas simples
+    r"'[^']'"
+    t.value = t.value[1]
     return t
 
-# Função para rastrear número de linhas
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-# Ignorar espaços e tabulações
 t_ignore = ' \t'
 
-# Função para tratar erros
 def t_error(t):
     print(f"Caractere ilegal: {t.value[0]} na linha {t.lineno}")
     t.lexer.skip(1)
 
-# Constrói o analisador léxico
 lexer = lex.lex()
 
 # Regras da gramática
-
 def p_programa(p):
     """programa : lista_declaracoes"""
-    p[0] = p[1]
+    p[0] = ('program', p[1])
 
-# Lista de declarações
 def p_lista_declaracoes(p):
     """lista_declaracoes : lista_declaracoes declaracao
                           | declaracao"""
-    if len(p) == 3:
-        p[0] = p[1] + [p[2]]
-    else:
-        p[0] = [p[1]]
+    p[0] = p[1] + [p[2]] if len(p) == 3 else [p[1]]
 
-# Declarações gerais, incluindo funções e variáveis
 def p_declaracao(p):
     """declaracao : declaracao_variaveis
                   | declaracao_funcao
@@ -107,38 +93,27 @@ def p_declaracao(p):
                   | atribuicao"""
     p[0] = p[1]
 
-# Declarações de variáveis
 def p_declaracao_variaveis(p):
-    """declaracao_variaveis : tipo lista_variaveis ';'"""
+    """declaracao_variaveis : tipo lista_variaveis DELIMITADOR"""
     p[0] = ('var_declaration', p[1], p[2])
 
-# Declarações de função
 def p_declaracao_funcao(p):
-    """declaracao_funcao : tipo ID '(' parametros ')' bloco"""
+    """declaracao_funcao : tipo ID LPAREN parametros RPAREN bloco"""
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
-
-# Declarações de diretivas de pré-processador
 
 def p_declaracao_preprocessador(p):
     """declaracao_preprocessador : LIBIMPORT '<' ID '.' ID '>'"""
     p[0] = ('include', f"{p[3]}.{p[5]}")
 
-
-# Tipo de dados
 def p_tipo(p):
     """tipo : TIPO"""
     p[0] = p[1]
 
-# Lista de variáveis
 def p_lista_variaveis(p):
     """lista_variaveis : lista_variaveis ',' ID
                         | ID"""
-    if len(p) == 4:
-        p[0] = p[1] + [p[3]]
-    else:
-        p[0] = [p[1]]
+    p[0] = p[1] + [p[3]] if len(p) == 4 else [p[1]]
 
-# Lista de parâmetros para funções
 def p_parametros(p):
     """parametros : lista_parametros
                    | vazio"""
@@ -147,80 +122,61 @@ def p_parametros(p):
 def p_lista_parametros(p):
     """lista_parametros : lista_parametros ',' tipo ID
                          | tipo ID"""
-    if len(p) == 5:
-        p[0] = p[1] + [(p[3], p[4])]
-    else:
-        p[0] = [(p[1], p[2])]
+    p[0] = p[1] + [(p[3], p[4])] if len(p) == 5 else [(p[1], p[2])]
 
-# Bloco de comandos
 def p_bloco(p):
-    """bloco : '{' lista_comandos '}'"""
-    p[0] = p[2]
+    """bloco : LCHAVE lista_comandos RCHAVE"""
+    p[0] = ('block', p[2])
 
-# Lista de comandos
 def p_lista_comandos(p):
     """lista_comandos : lista_comandos comando
                       | comando"""
-    if len(p) == 3:
-        p[0] = p[1] + [p[2]]
-    else:
-        p[0] = [p[1]]
+    p[0] = p[1] + [p[2]] if len(p) == 3 else [p[1]]
 
-# Definição de comandos
 def p_comando(p):
     """comando : atribuicao
                | comando_condicional
                | comando_loop
-               | bloco"""
+               | bloco
+               | declaracao_variaveis"""  # Agora aceita declarações dentro do bloco
     p[0] = p[1]
 
-# Atribuições
 def p_atribuicao(p):
     """atribuicao : ID ATR expressao DELIMITADOR"""
     p[0] = ('assign', p[1], p[3])
 
-# Comando condicional
 def p_comando_condicional(p):
-    """comando_condicional : IF '(' expressao ')' bloco"""
+    """comando_condicional : IF LPAREN expressao RPAREN bloco"""
+    print(f"Condição do IF: {p[3]}")
+    print(f"Bloco do IF: {p[5]}")
     p[0] = ('if', p[3], p[5])
 
-# Comando de loop
 def p_comando_loop(p):
-    """comando_loop : FOR '(' atribuicao expressao ';' atribuicao ')' bloco
-                    | WHILE '(' expressao ')' bloco"""
-    if p[1] == 'for':
-        p[0] = ('for', p[3], p[4], p[6], p[8])
-    else:
-        p[0] = ('while', p[3], p[5])
+    """comando_loop : WHILE LPAREN expressao RPAREN bloco"""
+    p[0] = ('while', p[3], p[5])
 
-# Definição de expressões
 def p_expressao(p):
     """expressao : expressao OPL expressao
                  | expressao OPA expressao
+                 | LPAREN expressao RPAREN
                  | ID
-                 | NUMERO
-                 | '(' expressao ')'"""
+                 | NUMERO"""
     if len(p) == 4:
         p[0] = (p[2], p[1], p[3])
-    elif len(p) == 2:
-        p[0] = p[1]
     else:
-        p[0] = p[2]
+        p[0] = p[1]
 
-# Regra de vazio
 def p_vazio(p):
     """vazio : """
     p[0] = []
 
-# Tratamento de erro
 def p_error(p):
     if p:
         print(f"Erro de sintaxe no token '{p.value}', linha {p.lineno}")
     else:
         print("Erro de sintaxe: EOF inesperado")
 
-# Criar o analisador sintático
-analisador_sintatico = yacc.yacc()
+parser = yacc.yacc()
 
 def preprocess_code(code):
     defines = {}
@@ -243,9 +199,16 @@ def analisar_entrada(entrada):
         tok = lexer.token()
 
     print("\nAnálise sintática:")
-    resultado = analisador_sintatico.parse(entrada, lexer=lexer)
-    print("\nResultado da análise sintática:")
+    resultado = parser.parse(entrada, lexer=lexer)
+    print("\nEstrutura da árvore sintática:")
     print(resultado)
+
+    if resultado:
+        print("\nÁrvore gerada com sucesso!")
+        return resultado
+    else:
+        print("\nErro na geração da árvore.")
+        return None
 
 def main():
     #opcao = input("Deseja fornecer uma expressão (E) ou um arquivo (A)? ").strip().upper()
@@ -255,7 +218,7 @@ def main():
         analisar_entrada(entrada)
     elif opcao == 'A':
         #arquivo = input("Digite o caminho do arquivo: ").strip()
-        arquivo = "q.c"
+        arquivo = "basico.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()

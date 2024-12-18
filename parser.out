@@ -27,7 +27,7 @@ Rule 6     declaracao -> declaracao_preprocessador
 Rule 7     declaracao -> atribuicao
 Rule 8     declaracao_variaveis -> tipo lista_variaveis DELIMITADOR
 Rule 9     declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco
-Rule 10    declaracao_preprocessador -> LIBIMPORT < ID . ID >
+Rule 10    declaracao_preprocessador -> LIBIMPORT
 Rule 11    tipo -> TIPO
 Rule 12    lista_variaveis -> lista_variaveis , ID
 Rule 13    lista_variaveis -> ID
@@ -56,9 +56,6 @@ Rule 34    vazio -> <empty>
 Terminals, with rules where they appear
 
 ,                    : 12 16
-.                    : 10
-<                    : 10
->                    : 10
 ATR                  : 26
 BOOLEAN              : 
 CASE                 : 
@@ -69,7 +66,7 @@ DELIMITADOR          : 8 26
 DO                   : 
 ELSE                 : 
 FOR                  : 
-ID                   : 9 10 10 12 13 16 17 26 32
+ID                   : 9 12 13 16 17 26 32
 IF                   : 27
 LBRACKET             : 
 LCHAVE               : 18
@@ -122,7 +119,7 @@ state 0
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
     (9) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT < ID . ID >
+    (10) declaracao_preprocessador -> . LIBIMPORT
     (26) atribuicao -> . ID ATR expressao DELIMITADOR
     (11) tipo -> . TIPO
 
@@ -155,7 +152,7 @@ state 2
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
     (9) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT < ID . ID >
+    (10) declaracao_preprocessador -> . LIBIMPORT
     (26) atribuicao -> . ID ATR expressao DELIMITADOR
     (11) tipo -> . TIPO
 
@@ -241,9 +238,12 @@ state 9
 
 state 10
 
-    (10) declaracao_preprocessador -> LIBIMPORT . < ID . ID >
+    (10) declaracao_preprocessador -> LIBIMPORT .
 
-    <               shift and go to state 16
+    LIBIMPORT       reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
+    ID              reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
+    TIPO            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
+    $end            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
 
 
 state 11
@@ -268,8 +268,8 @@ state 13
     (8) declaracao_variaveis -> tipo lista_variaveis . DELIMITADOR
     (12) lista_variaveis -> lista_variaveis . , ID
 
-    DELIMITADOR     shift and go to state 17
-    ,               shift and go to state 18
+    DELIMITADOR     shift and go to state 16
+    ,               shift and go to state 17
 
 
 state 14
@@ -277,7 +277,7 @@ state 14
     (9) declaracao_funcao -> tipo ID . LPAREN parametros RPAREN bloco
     (13) lista_variaveis -> ID .
 
-    LPAREN          shift and go to state 19
+    LPAREN          shift and go to state 18
     DELIMITADOR     reduce using rule 13 (lista_variaveis -> ID .)
     ,               reduce using rule 13 (lista_variaveis -> ID .)
 
@@ -291,20 +291,13 @@ state 15
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 21
+    expressao                      shift and go to state 20
 
 state 16
-
-    (10) declaracao_preprocessador -> LIBIMPORT < . ID . ID >
-
-    ID              shift and go to state 24
-
-
-state 17
 
     (8) declaracao_variaveis -> tipo lista_variaveis DELIMITADOR .
 
@@ -318,14 +311,14 @@ state 17
     LCHAVE          reduce using rule 8 (declaracao_variaveis -> tipo lista_variaveis DELIMITADOR .)
 
 
-state 18
+state 17
 
     (12) lista_variaveis -> lista_variaveis , . ID
 
-    ID              shift and go to state 25
+    ID              shift and go to state 23
 
 
-state 19
+state 18
 
     (9) declaracao_funcao -> tipo ID LPAREN . parametros RPAREN bloco
     (14) parametros -> . lista_parametros
@@ -338,12 +331,12 @@ state 19
     RPAREN          reduce using rule 34 (vazio -> .)
     TIPO            shift and go to state 11
 
-    tipo                           shift and go to state 26
-    parametros                     shift and go to state 27
-    lista_parametros               shift and go to state 28
-    vazio                          shift and go to state 29
+    tipo                           shift and go to state 24
+    parametros                     shift and go to state 25
+    lista_parametros               shift and go to state 26
+    vazio                          shift and go to state 27
 
-state 20
+state 19
 
     (32) expressao -> ID .
 
@@ -353,18 +346,18 @@ state 20
     RPAREN          reduce using rule 32 (expressao -> ID .)
 
 
-state 21
+state 20
 
     (26) atribuicao -> ID ATR expressao . DELIMITADOR
     (29) expressao -> expressao . OPL expressao
     (30) expressao -> expressao . OPA expressao
 
-    DELIMITADOR     shift and go to state 30
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    DELIMITADOR     shift and go to state 28
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
 
-state 22
+state 21
 
     (31) expressao -> LPAREN . expressao RPAREN
     (29) expressao -> . expressao OPL expressao
@@ -373,13 +366,13 @@ state 22
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 33
+    expressao                      shift and go to state 31
 
-state 23
+state 22
 
     (33) expressao -> NUMERO .
 
@@ -389,14 +382,7 @@ state 23
     RPAREN          reduce using rule 33 (expressao -> NUMERO .)
 
 
-state 24
-
-    (10) declaracao_preprocessador -> LIBIMPORT < ID . . ID >
-
-    .               shift and go to state 34
-
-
-state 25
+state 23
 
     (12) lista_variaveis -> lista_variaveis , ID .
 
@@ -404,37 +390,37 @@ state 25
     ,               reduce using rule 12 (lista_variaveis -> lista_variaveis , ID .)
 
 
-state 26
+state 24
 
     (17) lista_parametros -> tipo . ID
 
-    ID              shift and go to state 35
+    ID              shift and go to state 32
 
 
-state 27
+state 25
 
     (9) declaracao_funcao -> tipo ID LPAREN parametros . RPAREN bloco
 
-    RPAREN          shift and go to state 36
+    RPAREN          shift and go to state 33
 
 
-state 28
+state 26
 
     (14) parametros -> lista_parametros .
     (16) lista_parametros -> lista_parametros . , tipo ID
 
     RPAREN          reduce using rule 14 (parametros -> lista_parametros .)
-    ,               shift and go to state 37
+    ,               shift and go to state 34
 
 
-state 29
+state 27
 
     (15) parametros -> vazio .
 
     RPAREN          reduce using rule 15 (parametros -> vazio .)
 
 
-state 30
+state 28
 
     (26) atribuicao -> ID ATR expressao DELIMITADOR .
 
@@ -448,7 +434,7 @@ state 30
     LCHAVE          reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
 
 
-state 31
+state 29
 
     (29) expressao -> expressao OPL . expressao
     (29) expressao -> . expressao OPL expressao
@@ -457,13 +443,13 @@ state 31
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 38
+    expressao                      shift and go to state 35
 
-state 32
+state 30
 
     (30) expressao -> expressao OPA . expressao
     (29) expressao -> . expressao OPL expressao
@@ -472,31 +458,24 @@ state 32
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 39
+    expressao                      shift and go to state 36
 
-state 33
+state 31
 
     (31) expressao -> LPAREN expressao . RPAREN
     (29) expressao -> expressao . OPL expressao
     (30) expressao -> expressao . OPA expressao
 
-    RPAREN          shift and go to state 40
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    RPAREN          shift and go to state 37
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
 
-state 34
-
-    (10) declaracao_preprocessador -> LIBIMPORT < ID . . ID >
-
-    ID              shift and go to state 41
-
-
-state 35
+state 32
 
     (17) lista_parametros -> tipo ID .
 
@@ -504,25 +483,25 @@ state 35
     RPAREN          reduce using rule 17 (lista_parametros -> tipo ID .)
 
 
-state 36
+state 33
 
     (9) declaracao_funcao -> tipo ID LPAREN parametros RPAREN . bloco
     (18) bloco -> . LCHAVE lista_comandos RCHAVE
 
-    LCHAVE          shift and go to state 43
+    LCHAVE          shift and go to state 39
 
-    bloco                          shift and go to state 42
+    bloco                          shift and go to state 38
 
-state 37
+state 34
 
     (16) lista_parametros -> lista_parametros , . tipo ID
     (11) tipo -> . TIPO
 
     TIPO            shift and go to state 11
 
-    tipo                           shift and go to state 44
+    tipo                           shift and go to state 40
 
-state 38
+state 35
 
     (29) expressao -> expressao OPL expressao .
     (29) expressao -> expressao . OPL expressao
@@ -532,14 +511,14 @@ state 38
   ! shift/reduce conflict for OPA resolved as shift
     DELIMITADOR     reduce using rule 29 (expressao -> expressao OPL expressao .)
     RPAREN          reduce using rule 29 (expressao -> expressao OPL expressao .)
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
   ! OPL             [ reduce using rule 29 (expressao -> expressao OPL expressao .) ]
   ! OPA             [ reduce using rule 29 (expressao -> expressao OPL expressao .) ]
 
 
-state 39
+state 36
 
     (30) expressao -> expressao OPA expressao .
     (29) expressao -> expressao . OPL expressao
@@ -549,14 +528,14 @@ state 39
   ! shift/reduce conflict for OPA resolved as shift
     DELIMITADOR     reduce using rule 30 (expressao -> expressao OPA expressao .)
     RPAREN          reduce using rule 30 (expressao -> expressao OPA expressao .)
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
   ! OPL             [ reduce using rule 30 (expressao -> expressao OPA expressao .) ]
   ! OPA             [ reduce using rule 30 (expressao -> expressao OPA expressao .) ]
 
 
-state 40
+state 37
 
     (31) expressao -> LPAREN expressao RPAREN .
 
@@ -566,14 +545,7 @@ state 40
     RPAREN          reduce using rule 31 (expressao -> LPAREN expressao RPAREN .)
 
 
-state 41
-
-    (10) declaracao_preprocessador -> LIBIMPORT < ID . ID . >
-
-    >               shift and go to state 45
-
-
-state 42
+state 38
 
     (9) declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .
 
@@ -583,7 +555,7 @@ state 42
     $end            reduce using rule 9 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
 
 
-state 43
+state 39
 
     (18) bloco -> LCHAVE . lista_comandos RCHAVE
     (19) lista_comandos -> . lista_comandos comando
@@ -601,38 +573,28 @@ state 43
     (11) tipo -> . TIPO
 
     ID              shift and go to state 9
-    IF              shift and go to state 53
-    WHILE           shift and go to state 54
-    LCHAVE          shift and go to state 43
+    IF              shift and go to state 48
+    WHILE           shift and go to state 49
+    LCHAVE          shift and go to state 39
     TIPO            shift and go to state 11
 
-    lista_comandos                 shift and go to state 46
-    comando                        shift and go to state 47
-    atribuicao                     shift and go to state 48
-    comando_condicional            shift and go to state 49
-    comando_loop                   shift and go to state 50
-    bloco                          shift and go to state 51
-    declaracao_variaveis           shift and go to state 52
-    tipo                           shift and go to state 55
+    lista_comandos                 shift and go to state 41
+    comando                        shift and go to state 42
+    atribuicao                     shift and go to state 43
+    comando_condicional            shift and go to state 44
+    comando_loop                   shift and go to state 45
+    bloco                          shift and go to state 46
+    declaracao_variaveis           shift and go to state 47
+    tipo                           shift and go to state 50
 
-state 44
+state 40
 
     (16) lista_parametros -> lista_parametros , tipo . ID
 
-    ID              shift and go to state 56
+    ID              shift and go to state 51
 
 
-state 45
-
-    (10) declaracao_preprocessador -> LIBIMPORT < ID . ID > .
-
-    LIBIMPORT       reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT < ID . ID > .)
-    ID              reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT < ID . ID > .)
-    TIPO            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT < ID . ID > .)
-    $end            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT < ID . ID > .)
-
-
-state 46
+state 41
 
     (18) bloco -> LCHAVE lista_comandos . RCHAVE
     (19) lista_comandos -> lista_comandos . comando
@@ -648,22 +610,22 @@ state 46
     (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
     (11) tipo -> . TIPO
 
-    RCHAVE          shift and go to state 57
+    RCHAVE          shift and go to state 52
     ID              shift and go to state 9
-    IF              shift and go to state 53
-    WHILE           shift and go to state 54
-    LCHAVE          shift and go to state 43
+    IF              shift and go to state 48
+    WHILE           shift and go to state 49
+    LCHAVE          shift and go to state 39
     TIPO            shift and go to state 11
 
-    comando                        shift and go to state 58
-    atribuicao                     shift and go to state 48
-    comando_condicional            shift and go to state 49
-    comando_loop                   shift and go to state 50
-    bloco                          shift and go to state 51
-    declaracao_variaveis           shift and go to state 52
-    tipo                           shift and go to state 55
+    comando                        shift and go to state 53
+    atribuicao                     shift and go to state 43
+    comando_condicional            shift and go to state 44
+    comando_loop                   shift and go to state 45
+    bloco                          shift and go to state 46
+    declaracao_variaveis           shift and go to state 47
+    tipo                           shift and go to state 50
 
-state 47
+state 42
 
     (20) lista_comandos -> comando .
 
@@ -675,7 +637,7 @@ state 47
     TIPO            reduce using rule 20 (lista_comandos -> comando .)
 
 
-state 48
+state 43
 
     (21) comando -> atribuicao .
 
@@ -687,7 +649,7 @@ state 48
     TIPO            reduce using rule 21 (comando -> atribuicao .)
 
 
-state 49
+state 44
 
     (22) comando -> comando_condicional .
 
@@ -699,7 +661,7 @@ state 49
     TIPO            reduce using rule 22 (comando -> comando_condicional .)
 
 
-state 50
+state 45
 
     (23) comando -> comando_loop .
 
@@ -711,7 +673,7 @@ state 50
     TIPO            reduce using rule 23 (comando -> comando_loop .)
 
 
-state 51
+state 46
 
     (24) comando -> bloco .
 
@@ -723,7 +685,7 @@ state 51
     TIPO            reduce using rule 24 (comando -> bloco .)
 
 
-state 52
+state 47
 
     (25) comando -> declaracao_variaveis .
 
@@ -735,31 +697,31 @@ state 52
     TIPO            reduce using rule 25 (comando -> declaracao_variaveis .)
 
 
-state 53
+state 48
 
     (27) comando_condicional -> IF . LPAREN expressao RPAREN bloco
 
-    LPAREN          shift and go to state 59
+    LPAREN          shift and go to state 54
 
 
-state 54
+state 49
 
     (28) comando_loop -> WHILE . LPAREN expressao RPAREN bloco
 
-    LPAREN          shift and go to state 60
+    LPAREN          shift and go to state 55
 
 
-state 55
+state 50
 
     (8) declaracao_variaveis -> tipo . lista_variaveis DELIMITADOR
     (12) lista_variaveis -> . lista_variaveis , ID
     (13) lista_variaveis -> . ID
 
-    ID              shift and go to state 61
+    ID              shift and go to state 56
 
     lista_variaveis                shift and go to state 13
 
-state 56
+state 51
 
     (16) lista_parametros -> lista_parametros , tipo ID .
 
@@ -767,7 +729,7 @@ state 56
     RPAREN          reduce using rule 16 (lista_parametros -> lista_parametros , tipo ID .)
 
 
-state 57
+state 52
 
     (18) bloco -> LCHAVE lista_comandos RCHAVE .
 
@@ -781,7 +743,7 @@ state 57
     LCHAVE          reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
 
 
-state 58
+state 53
 
     (19) lista_comandos -> lista_comandos comando .
 
@@ -793,7 +755,7 @@ state 58
     TIPO            reduce using rule 19 (lista_comandos -> lista_comandos comando .)
 
 
-state 59
+state 54
 
     (27) comando_condicional -> IF LPAREN . expressao RPAREN bloco
     (29) expressao -> . expressao OPL expressao
@@ -802,13 +764,13 @@ state 59
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 62
+    expressao                      shift and go to state 57
 
-state 60
+state 55
 
     (28) comando_loop -> WHILE LPAREN . expressao RPAREN bloco
     (29) expressao -> . expressao OPL expressao
@@ -817,13 +779,13 @@ state 60
     (32) expressao -> . ID
     (33) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 22
-    ID              shift and go to state 20
-    NUMERO          shift and go to state 23
+    LPAREN          shift and go to state 21
+    ID              shift and go to state 19
+    NUMERO          shift and go to state 22
 
-    expressao                      shift and go to state 63
+    expressao                      shift and go to state 58
 
-state 61
+state 56
 
     (13) lista_variaveis -> ID .
 
@@ -831,47 +793,47 @@ state 61
     ,               reduce using rule 13 (lista_variaveis -> ID .)
 
 
-state 62
+state 57
 
     (27) comando_condicional -> IF LPAREN expressao . RPAREN bloco
     (29) expressao -> expressao . OPL expressao
     (30) expressao -> expressao . OPA expressao
 
-    RPAREN          shift and go to state 64
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    RPAREN          shift and go to state 59
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
 
-state 63
+state 58
 
     (28) comando_loop -> WHILE LPAREN expressao . RPAREN bloco
     (29) expressao -> expressao . OPL expressao
     (30) expressao -> expressao . OPA expressao
 
-    RPAREN          shift and go to state 65
-    OPL             shift and go to state 31
-    OPA             shift and go to state 32
+    RPAREN          shift and go to state 60
+    OPL             shift and go to state 29
+    OPA             shift and go to state 30
 
 
-state 64
+state 59
 
     (27) comando_condicional -> IF LPAREN expressao RPAREN . bloco
     (18) bloco -> . LCHAVE lista_comandos RCHAVE
 
-    LCHAVE          shift and go to state 43
+    LCHAVE          shift and go to state 39
 
-    bloco                          shift and go to state 66
+    bloco                          shift and go to state 61
 
-state 65
+state 60
 
     (28) comando_loop -> WHILE LPAREN expressao RPAREN . bloco
     (18) bloco -> . LCHAVE lista_comandos RCHAVE
 
-    LCHAVE          shift and go to state 43
+    LCHAVE          shift and go to state 39
 
-    bloco                          shift and go to state 67
+    bloco                          shift and go to state 62
 
-state 66
+state 61
 
     (27) comando_condicional -> IF LPAREN expressao RPAREN bloco .
 
@@ -883,7 +845,7 @@ state 66
     TIPO            reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
 
 
-state 67
+state 62
 
     (28) comando_loop -> WHILE LPAREN expressao RPAREN bloco .
 
@@ -897,7 +859,7 @@ state 67
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for OPL in state 38 resolved as shift
-WARNING: shift/reduce conflict for OPA in state 38 resolved as shift
-WARNING: shift/reduce conflict for OPL in state 39 resolved as shift
-WARNING: shift/reduce conflict for OPA in state 39 resolved as shift
+WARNING: shift/reduce conflict for OPL in state 35 resolved as shift
+WARNING: shift/reduce conflict for OPA in state 35 resolved as shift
+WARNING: shift/reduce conflict for OPL in state 36 resolved as shift
+WARNING: shift/reduce conflict for OPA in state 36 resolved as shift
