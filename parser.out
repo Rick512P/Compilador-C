@@ -10,8 +10,6 @@ Unused terminals:
     DO
     ELSE
     FOR
-    LBRACKET
-    RBRACKET
     STRING
     SWITCH
 
@@ -26,84 +24,92 @@ Rule 5     declaracao -> declaracao_funcao
 Rule 6     declaracao -> declaracao_preprocessador
 Rule 7     declaracao -> atribuicao
 Rule 8     declaracao_variaveis -> tipo lista_variaveis DELIMITADOR
-Rule 9     declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco
-Rule 10    declaracao_preprocessador -> LIBIMPORT
-Rule 11    tipo -> TIPO
-Rule 12    lista_variaveis -> lista_variaveis , ID
-Rule 13    lista_variaveis -> ID
-Rule 14    parametros -> lista_parametros
-Rule 15    parametros -> vazio
-Rule 16    lista_parametros -> lista_parametros , tipo ID
-Rule 17    lista_parametros -> tipo ID
-Rule 18    bloco -> LCHAVE lista_comandos RCHAVE
-Rule 19    lista_comandos -> lista_comandos comando
-Rule 20    lista_comandos -> comando
-Rule 21    comando -> atribuicao
-Rule 22    comando -> comando_condicional
-Rule 23    comando -> comando_loop
-Rule 24    comando -> bloco
-Rule 25    comando -> declaracao_variaveis
-Rule 26    atribuicao -> ID ATR expressao DELIMITADOR
-Rule 27    comando_condicional -> IF LPAREN expressao RPAREN bloco
-Rule 28    comando_loop -> WHILE LPAREN expressao RPAREN bloco
-Rule 29    expressao -> expressao OPL expressao
-Rule 30    expressao -> expressao OPA expressao
-Rule 31    expressao -> LPAREN expressao RPAREN
-Rule 32    expressao -> ID
-Rule 33    expressao -> NUMERO
-Rule 34    vazio -> <empty>
+Rule 9     declaracao_variaveis -> tipo ID VECTOR
+Rule 10    declaracao_variaveis -> tipo ID MATRIX
+Rule 11    declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco
+Rule 12    declaracao_preprocessador -> LIBIMPORT
+Rule 13    expressao -> ID LBRACKET expressao RBRACKET
+Rule 14    expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+Rule 15    atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao
+Rule 16    atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+Rule 17    tipo -> TIPO
+Rule 18    lista_variaveis -> lista_variaveis , ID
+Rule 19    lista_variaveis -> ID
+Rule 20    parametros -> lista_parametros
+Rule 21    parametros -> vazio
+Rule 22    lista_parametros -> lista_parametros , tipo ID
+Rule 23    lista_parametros -> tipo ID
+Rule 24    bloco -> LCHAVE lista_comandos RCHAVE
+Rule 25    lista_comandos -> lista_comandos comando
+Rule 26    lista_comandos -> comando
+Rule 27    comando -> atribuicao
+Rule 28    comando -> comando_condicional
+Rule 29    comando -> comando_loop
+Rule 30    comando -> bloco
+Rule 31    comando -> declaracao_variaveis
+Rule 32    atribuicao -> ID ATR expressao DELIMITADOR
+Rule 33    comando_condicional -> IF LPAREN expressao RPAREN bloco
+Rule 34    comando_loop -> WHILE LPAREN expressao RPAREN bloco
+Rule 35    expressao -> expressao OPL expressao
+Rule 36    expressao -> expressao OPA expressao
+Rule 37    expressao -> LPAREN expressao RPAREN
+Rule 38    expressao -> ID
+Rule 39    expressao -> NUMERO
+Rule 40    vazio -> <empty>
 
 Terminals, with rules where they appear
 
-,                    : 12 16
-ATR                  : 26
+,                    : 18 22
+ATR                  : 15 16 32
 BOOLEAN              : 
 CASE                 : 
 CHAR                 : 
 COMENTARIO           : 
 DEFINE               : 
-DELIMITADOR          : 8 26
+DELIMITADOR          : 8 32
 DO                   : 
 ELSE                 : 
 FOR                  : 
-ID                   : 9 12 13 16 17 26 32
-IF                   : 27
-LBRACKET             : 
-LCHAVE               : 18
-LIBIMPORT            : 10
-LPAREN               : 9 27 28 31
-NUMERO               : 33
-OPA                  : 30
-OPL                  : 29
-RBRACKET             : 
-RCHAVE               : 18
-RPAREN               : 9 27 28 31
+ID                   : 9 10 11 13 14 15 16 18 19 22 23 32 38
+IF                   : 33
+LBRACKET             : 13 14 14 15 16 16
+LCHAVE               : 24
+LIBIMPORT            : 12
+LPAREN               : 11 33 34 37
+MATRIX               : 10
+NUMERO               : 39
+OPA                  : 36
+OPL                  : 35
+RBRACKET             : 13 14 14 15 16 16
+RCHAVE               : 24
+RPAREN               : 11 33 34 37
 STRING               : 
 SWITCH               : 
-TIPO                 : 11
-WHILE                : 28
+TIPO                 : 17
+VECTOR               : 9
+WHILE                : 34
 error                : 
 
 Nonterminals, with rules where they appear
 
-atribuicao           : 7 21
-bloco                : 9 24 27 28
-comando              : 19 20
-comando_condicional  : 22
-comando_loop         : 23
+atribuicao           : 7 27
+bloco                : 11 30 33 34
+comando              : 25 26
+comando_condicional  : 28
+comando_loop         : 29
 declaracao           : 2 3
 declaracao_funcao    : 5
 declaracao_preprocessador : 6
-declaracao_variaveis : 4 25
-expressao            : 26 27 28 29 29 30 30 31
-lista_comandos       : 18 19
+declaracao_variaveis : 4 31
+expressao            : 13 14 14 15 15 16 16 16 32 33 34 35 35 36 36 37
+lista_comandos       : 24 25
 lista_declaracoes    : 1 2
-lista_parametros     : 14 16
-lista_variaveis      : 8 12
-parametros           : 9
+lista_parametros     : 20 22
+lista_variaveis      : 8 18
+parametros           : 11
 programa             : 0
-tipo                 : 8 9 16 17
-vazio                : 15
+tipo                 : 8 9 10 11 22 23
+vazio                : 21
 
 Parsing method: LALR
 
@@ -118,10 +124,14 @@ state 0
     (6) declaracao -> . declaracao_preprocessador
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
-    (9) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT
-    (26) atribuicao -> . ID ATR expressao DELIMITADOR
-    (11) tipo -> . TIPO
+    (9) declaracao_variaveis -> . tipo ID VECTOR
+    (10) declaracao_variaveis -> . tipo ID MATRIX
+    (11) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
+    (12) declaracao_preprocessador -> . LIBIMPORT
+    (15) atribuicao -> . ID LBRACKET expressao RBRACKET ATR expressao
+    (16) atribuicao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (32) atribuicao -> . ID ATR expressao DELIMITADOR
+    (17) tipo -> . TIPO
 
     LIBIMPORT       shift and go to state 10
     ID              shift and go to state 9
@@ -151,10 +161,14 @@ state 2
     (6) declaracao -> . declaracao_preprocessador
     (7) declaracao -> . atribuicao
     (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
-    (9) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
-    (10) declaracao_preprocessador -> . LIBIMPORT
-    (26) atribuicao -> . ID ATR expressao DELIMITADOR
-    (11) tipo -> . TIPO
+    (9) declaracao_variaveis -> . tipo ID VECTOR
+    (10) declaracao_variaveis -> . tipo ID MATRIX
+    (11) declaracao_funcao -> . tipo ID LPAREN parametros RPAREN bloco
+    (12) declaracao_preprocessador -> . LIBIMPORT
+    (15) atribuicao -> . ID LBRACKET expressao RBRACKET ATR expressao
+    (16) atribuicao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (32) atribuicao -> . ID ATR expressao DELIMITADOR
+    (17) tipo -> . TIPO
 
     $end            reduce using rule 1 (programa -> lista_declaracoes .)
     LIBIMPORT       shift and go to state 10
@@ -221,9 +235,11 @@ state 7
 state 8
 
     (8) declaracao_variaveis -> tipo . lista_variaveis DELIMITADOR
-    (9) declaracao_funcao -> tipo . ID LPAREN parametros RPAREN bloco
-    (12) lista_variaveis -> . lista_variaveis , ID
-    (13) lista_variaveis -> . ID
+    (9) declaracao_variaveis -> tipo . ID VECTOR
+    (10) declaracao_variaveis -> tipo . ID MATRIX
+    (11) declaracao_funcao -> tipo . ID LPAREN parametros RPAREN bloco
+    (18) lista_variaveis -> . lista_variaveis , ID
+    (19) lista_variaveis -> . ID
 
     ID              shift and go to state 14
 
@@ -231,26 +247,29 @@ state 8
 
 state 9
 
-    (26) atribuicao -> ID . ATR expressao DELIMITADOR
+    (15) atribuicao -> ID . LBRACKET expressao RBRACKET ATR expressao
+    (16) atribuicao -> ID . LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (32) atribuicao -> ID . ATR expressao DELIMITADOR
 
-    ATR             shift and go to state 15
+    LBRACKET        shift and go to state 15
+    ATR             shift and go to state 16
 
 
 state 10
 
-    (10) declaracao_preprocessador -> LIBIMPORT .
+    (12) declaracao_preprocessador -> LIBIMPORT .
 
-    LIBIMPORT       reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
-    ID              reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
-    TIPO            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
-    $end            reduce using rule 10 (declaracao_preprocessador -> LIBIMPORT .)
+    LIBIMPORT       reduce using rule 12 (declaracao_preprocessador -> LIBIMPORT .)
+    ID              reduce using rule 12 (declaracao_preprocessador -> LIBIMPORT .)
+    TIPO            reduce using rule 12 (declaracao_preprocessador -> LIBIMPORT .)
+    $end            reduce using rule 12 (declaracao_preprocessador -> LIBIMPORT .)
 
 
 state 11
 
-    (11) tipo -> TIPO .
+    (17) tipo -> TIPO .
 
-    ID              reduce using rule 11 (tipo -> TIPO .)
+    ID              reduce using rule 17 (tipo -> TIPO .)
 
 
 state 12
@@ -266,38 +285,62 @@ state 12
 state 13
 
     (8) declaracao_variaveis -> tipo lista_variaveis . DELIMITADOR
-    (12) lista_variaveis -> lista_variaveis . , ID
+    (18) lista_variaveis -> lista_variaveis . , ID
 
-    DELIMITADOR     shift and go to state 16
-    ,               shift and go to state 17
+    DELIMITADOR     shift and go to state 17
+    ,               shift and go to state 18
 
 
 state 14
 
-    (9) declaracao_funcao -> tipo ID . LPAREN parametros RPAREN bloco
-    (13) lista_variaveis -> ID .
+    (9) declaracao_variaveis -> tipo ID . VECTOR
+    (10) declaracao_variaveis -> tipo ID . MATRIX
+    (11) declaracao_funcao -> tipo ID . LPAREN parametros RPAREN bloco
+    (19) lista_variaveis -> ID .
 
-    LPAREN          shift and go to state 18
-    DELIMITADOR     reduce using rule 13 (lista_variaveis -> ID .)
-    ,               reduce using rule 13 (lista_variaveis -> ID .)
+    VECTOR          shift and go to state 19
+    MATRIX          shift and go to state 20
+    LPAREN          shift and go to state 21
+    DELIMITADOR     reduce using rule 19 (lista_variaveis -> ID .)
+    ,               reduce using rule 19 (lista_variaveis -> ID .)
 
 
 state 15
 
-    (26) atribuicao -> ID ATR . expressao DELIMITADOR
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (15) atribuicao -> ID LBRACKET . expressao RBRACKET ATR expressao
+    (16) atribuicao -> ID LBRACKET . expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
-    expressao                      shift and go to state 20
+    expressao                      shift and go to state 23
 
 state 16
+
+    (32) atribuicao -> ID ATR . expressao DELIMITADOR
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
+
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
+
+    expressao                      shift and go to state 26
+
+state 17
 
     (8) declaracao_variaveis -> tipo lista_variaveis DELIMITADOR .
 
@@ -311,555 +354,879 @@ state 16
     LCHAVE          reduce using rule 8 (declaracao_variaveis -> tipo lista_variaveis DELIMITADOR .)
 
 
-state 17
-
-    (12) lista_variaveis -> lista_variaveis , . ID
-
-    ID              shift and go to state 23
-
-
 state 18
 
-    (9) declaracao_funcao -> tipo ID LPAREN . parametros RPAREN bloco
-    (14) parametros -> . lista_parametros
-    (15) parametros -> . vazio
-    (16) lista_parametros -> . lista_parametros , tipo ID
-    (17) lista_parametros -> . tipo ID
-    (34) vazio -> .
-    (11) tipo -> . TIPO
+    (18) lista_variaveis -> lista_variaveis , . ID
 
-    RPAREN          reduce using rule 34 (vazio -> .)
-    TIPO            shift and go to state 11
+    ID              shift and go to state 27
 
-    tipo                           shift and go to state 24
-    parametros                     shift and go to state 25
-    lista_parametros               shift and go to state 26
-    vazio                          shift and go to state 27
 
 state 19
 
-    (32) expressao -> ID .
+    (9) declaracao_variaveis -> tipo ID VECTOR .
 
-    DELIMITADOR     reduce using rule 32 (expressao -> ID .)
-    OPL             reduce using rule 32 (expressao -> ID .)
-    OPA             reduce using rule 32 (expressao -> ID .)
-    RPAREN          reduce using rule 32 (expressao -> ID .)
+    LIBIMPORT       reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    ID              reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    TIPO            reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    $end            reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    RCHAVE          reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    IF              reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    WHILE           reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
+    LCHAVE          reduce using rule 9 (declaracao_variaveis -> tipo ID VECTOR .)
 
 
 state 20
 
-    (26) atribuicao -> ID ATR expressao . DELIMITADOR
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (10) declaracao_variaveis -> tipo ID MATRIX .
 
-    DELIMITADOR     shift and go to state 28
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
+    LIBIMPORT       reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    ID              reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    TIPO            reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    $end            reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    RCHAVE          reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    IF              reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    WHILE           reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
+    LCHAVE          reduce using rule 10 (declaracao_variaveis -> tipo ID MATRIX .)
 
 
 state 21
 
-    (31) expressao -> LPAREN . expressao RPAREN
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (11) declaracao_funcao -> tipo ID LPAREN . parametros RPAREN bloco
+    (20) parametros -> . lista_parametros
+    (21) parametros -> . vazio
+    (22) lista_parametros -> . lista_parametros , tipo ID
+    (23) lista_parametros -> . tipo ID
+    (40) vazio -> .
+    (17) tipo -> . TIPO
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    RPAREN          reduce using rule 40 (vazio -> .)
+    TIPO            shift and go to state 11
 
-    expressao                      shift and go to state 31
+    tipo                           shift and go to state 28
+    parametros                     shift and go to state 29
+    lista_parametros               shift and go to state 30
+    vazio                          shift and go to state 31
 
 state 22
 
-    (33) expressao -> NUMERO .
+    (13) expressao -> ID . LBRACKET expressao RBRACKET
+    (14) expressao -> ID . LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (38) expressao -> ID .
 
-    DELIMITADOR     reduce using rule 33 (expressao -> NUMERO .)
-    OPL             reduce using rule 33 (expressao -> NUMERO .)
-    OPA             reduce using rule 33 (expressao -> NUMERO .)
-    RPAREN          reduce using rule 33 (expressao -> NUMERO .)
+    LBRACKET        shift and go to state 32
+    RBRACKET        reduce using rule 38 (expressao -> ID .)
+    OPL             reduce using rule 38 (expressao -> ID .)
+    OPA             reduce using rule 38 (expressao -> ID .)
+    DELIMITADOR     reduce using rule 38 (expressao -> ID .)
+    RPAREN          reduce using rule 38 (expressao -> ID .)
+    LIBIMPORT       reduce using rule 38 (expressao -> ID .)
+    ID              reduce using rule 38 (expressao -> ID .)
+    TIPO            reduce using rule 38 (expressao -> ID .)
+    $end            reduce using rule 38 (expressao -> ID .)
+    RCHAVE          reduce using rule 38 (expressao -> ID .)
+    IF              reduce using rule 38 (expressao -> ID .)
+    WHILE           reduce using rule 38 (expressao -> ID .)
+    LCHAVE          reduce using rule 38 (expressao -> ID .)
 
 
 state 23
 
-    (12) lista_variaveis -> lista_variaveis , ID .
+    (15) atribuicao -> ID LBRACKET expressao . RBRACKET ATR expressao
+    (16) atribuicao -> ID LBRACKET expressao . RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    DELIMITADOR     reduce using rule 12 (lista_variaveis -> lista_variaveis , ID .)
-    ,               reduce using rule 12 (lista_variaveis -> lista_variaveis , ID .)
+    RBRACKET        shift and go to state 33
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
 
 state 24
 
-    (17) lista_parametros -> tipo . ID
+    (37) expressao -> LPAREN . expressao RPAREN
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    ID              shift and go to state 32
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
+    expressao                      shift and go to state 36
 
 state 25
 
-    (9) declaracao_funcao -> tipo ID LPAREN parametros . RPAREN bloco
+    (39) expressao -> NUMERO .
 
-    RPAREN          shift and go to state 33
+    RBRACKET        reduce using rule 39 (expressao -> NUMERO .)
+    OPL             reduce using rule 39 (expressao -> NUMERO .)
+    OPA             reduce using rule 39 (expressao -> NUMERO .)
+    DELIMITADOR     reduce using rule 39 (expressao -> NUMERO .)
+    RPAREN          reduce using rule 39 (expressao -> NUMERO .)
+    LIBIMPORT       reduce using rule 39 (expressao -> NUMERO .)
+    ID              reduce using rule 39 (expressao -> NUMERO .)
+    TIPO            reduce using rule 39 (expressao -> NUMERO .)
+    $end            reduce using rule 39 (expressao -> NUMERO .)
+    RCHAVE          reduce using rule 39 (expressao -> NUMERO .)
+    IF              reduce using rule 39 (expressao -> NUMERO .)
+    WHILE           reduce using rule 39 (expressao -> NUMERO .)
+    LCHAVE          reduce using rule 39 (expressao -> NUMERO .)
 
 
 state 26
 
-    (14) parametros -> lista_parametros .
-    (16) lista_parametros -> lista_parametros . , tipo ID
+    (32) atribuicao -> ID ATR expressao . DELIMITADOR
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    RPAREN          reduce using rule 14 (parametros -> lista_parametros .)
-    ,               shift and go to state 34
+    DELIMITADOR     shift and go to state 37
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
 
 state 27
 
-    (15) parametros -> vazio .
+    (18) lista_variaveis -> lista_variaveis , ID .
 
-    RPAREN          reduce using rule 15 (parametros -> vazio .)
+    DELIMITADOR     reduce using rule 18 (lista_variaveis -> lista_variaveis , ID .)
+    ,               reduce using rule 18 (lista_variaveis -> lista_variaveis , ID .)
 
 
 state 28
 
-    (26) atribuicao -> ID ATR expressao DELIMITADOR .
+    (23) lista_parametros -> tipo . ID
 
-    LIBIMPORT       reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    ID              reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    TIPO            reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    $end            reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    RCHAVE          reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    IF              reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    WHILE           reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
-    LCHAVE          reduce using rule 26 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    ID              shift and go to state 38
 
 
 state 29
 
-    (29) expressao -> expressao OPL . expressao
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (11) declaracao_funcao -> tipo ID LPAREN parametros . RPAREN bloco
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    RPAREN          shift and go to state 39
 
-    expressao                      shift and go to state 35
 
 state 30
 
-    (30) expressao -> expressao OPA . expressao
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (20) parametros -> lista_parametros .
+    (22) lista_parametros -> lista_parametros . , tipo ID
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    RPAREN          reduce using rule 20 (parametros -> lista_parametros .)
+    ,               shift and go to state 40
 
-    expressao                      shift and go to state 36
 
 state 31
 
-    (31) expressao -> LPAREN expressao . RPAREN
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (21) parametros -> vazio .
 
-    RPAREN          shift and go to state 37
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
+    RPAREN          reduce using rule 21 (parametros -> vazio .)
 
 
 state 32
 
-    (17) lista_parametros -> tipo ID .
+    (13) expressao -> ID LBRACKET . expressao RBRACKET
+    (14) expressao -> ID LBRACKET . expressao RBRACKET LBRACKET expressao RBRACKET
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    ,               reduce using rule 17 (lista_parametros -> tipo ID .)
-    RPAREN          reduce using rule 17 (lista_parametros -> tipo ID .)
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
+    expressao                      shift and go to state 41
 
 state 33
 
-    (9) declaracao_funcao -> tipo ID LPAREN parametros RPAREN . bloco
-    (18) bloco -> . LCHAVE lista_comandos RCHAVE
+    (15) atribuicao -> ID LBRACKET expressao RBRACKET . ATR expressao
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET . LBRACKET expressao RBRACKET ATR expressao
 
-    LCHAVE          shift and go to state 39
+    ATR             shift and go to state 43
+    LBRACKET        shift and go to state 42
 
-    bloco                          shift and go to state 38
 
 state 34
 
-    (16) lista_parametros -> lista_parametros , . tipo ID
-    (11) tipo -> . TIPO
+    (35) expressao -> expressao OPL . expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    TIPO            shift and go to state 11
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
-    tipo                           shift and go to state 40
+    expressao                      shift and go to state 44
 
 state 35
 
-    (29) expressao -> expressao OPL expressao .
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (36) expressao -> expressao OPA . expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-  ! shift/reduce conflict for OPL resolved as shift
-  ! shift/reduce conflict for OPA resolved as shift
-    DELIMITADOR     reduce using rule 29 (expressao -> expressao OPL expressao .)
-    RPAREN          reduce using rule 29 (expressao -> expressao OPL expressao .)
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
-  ! OPL             [ reduce using rule 29 (expressao -> expressao OPL expressao .) ]
-  ! OPA             [ reduce using rule 29 (expressao -> expressao OPL expressao .) ]
-
+    expressao                      shift and go to state 45
 
 state 36
 
-    (30) expressao -> expressao OPA expressao .
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (37) expressao -> LPAREN expressao . RPAREN
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-  ! shift/reduce conflict for OPL resolved as shift
-  ! shift/reduce conflict for OPA resolved as shift
-    DELIMITADOR     reduce using rule 30 (expressao -> expressao OPA expressao .)
-    RPAREN          reduce using rule 30 (expressao -> expressao OPA expressao .)
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
-
-  ! OPL             [ reduce using rule 30 (expressao -> expressao OPA expressao .) ]
-  ! OPA             [ reduce using rule 30 (expressao -> expressao OPA expressao .) ]
+    RPAREN          shift and go to state 46
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
 
 state 37
 
-    (31) expressao -> LPAREN expressao RPAREN .
+    (32) atribuicao -> ID ATR expressao DELIMITADOR .
 
-    DELIMITADOR     reduce using rule 31 (expressao -> LPAREN expressao RPAREN .)
-    OPL             reduce using rule 31 (expressao -> LPAREN expressao RPAREN .)
-    OPA             reduce using rule 31 (expressao -> LPAREN expressao RPAREN .)
-    RPAREN          reduce using rule 31 (expressao -> LPAREN expressao RPAREN .)
+    LIBIMPORT       reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    ID              reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    TIPO            reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    $end            reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    RCHAVE          reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    IF              reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    WHILE           reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
+    LCHAVE          reduce using rule 32 (atribuicao -> ID ATR expressao DELIMITADOR .)
 
 
 state 38
 
-    (9) declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .
+    (23) lista_parametros -> tipo ID .
 
-    LIBIMPORT       reduce using rule 9 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
-    ID              reduce using rule 9 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
-    TIPO            reduce using rule 9 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
-    $end            reduce using rule 9 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
+    ,               reduce using rule 23 (lista_parametros -> tipo ID .)
+    RPAREN          reduce using rule 23 (lista_parametros -> tipo ID .)
 
 
 state 39
 
-    (18) bloco -> LCHAVE . lista_comandos RCHAVE
-    (19) lista_comandos -> . lista_comandos comando
-    (20) lista_comandos -> . comando
-    (21) comando -> . atribuicao
-    (22) comando -> . comando_condicional
-    (23) comando -> . comando_loop
-    (24) comando -> . bloco
-    (25) comando -> . declaracao_variaveis
-    (26) atribuicao -> . ID ATR expressao DELIMITADOR
-    (27) comando_condicional -> . IF LPAREN expressao RPAREN bloco
-    (28) comando_loop -> . WHILE LPAREN expressao RPAREN bloco
-    (18) bloco -> . LCHAVE lista_comandos RCHAVE
-    (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
-    (11) tipo -> . TIPO
+    (11) declaracao_funcao -> tipo ID LPAREN parametros RPAREN . bloco
+    (24) bloco -> . LCHAVE lista_comandos RCHAVE
 
-    ID              shift and go to state 9
-    IF              shift and go to state 48
-    WHILE           shift and go to state 49
-    LCHAVE          shift and go to state 39
-    TIPO            shift and go to state 11
+    LCHAVE          shift and go to state 48
 
-    lista_comandos                 shift and go to state 41
-    comando                        shift and go to state 42
-    atribuicao                     shift and go to state 43
-    comando_condicional            shift and go to state 44
-    comando_loop                   shift and go to state 45
-    bloco                          shift and go to state 46
-    declaracao_variaveis           shift and go to state 47
-    tipo                           shift and go to state 50
+    bloco                          shift and go to state 47
 
 state 40
 
-    (16) lista_parametros -> lista_parametros , tipo . ID
+    (22) lista_parametros -> lista_parametros , . tipo ID
+    (17) tipo -> . TIPO
 
-    ID              shift and go to state 51
+    TIPO            shift and go to state 11
 
+    tipo                           shift and go to state 49
 
 state 41
 
-    (18) bloco -> LCHAVE lista_comandos . RCHAVE
-    (19) lista_comandos -> lista_comandos . comando
-    (21) comando -> . atribuicao
-    (22) comando -> . comando_condicional
-    (23) comando -> . comando_loop
-    (24) comando -> . bloco
-    (25) comando -> . declaracao_variaveis
-    (26) atribuicao -> . ID ATR expressao DELIMITADOR
-    (27) comando_condicional -> . IF LPAREN expressao RPAREN bloco
-    (28) comando_loop -> . WHILE LPAREN expressao RPAREN bloco
-    (18) bloco -> . LCHAVE lista_comandos RCHAVE
-    (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
-    (11) tipo -> . TIPO
+    (13) expressao -> ID LBRACKET expressao . RBRACKET
+    (14) expressao -> ID LBRACKET expressao . RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    RCHAVE          shift and go to state 52
-    ID              shift and go to state 9
-    IF              shift and go to state 48
-    WHILE           shift and go to state 49
-    LCHAVE          shift and go to state 39
-    TIPO            shift and go to state 11
+    RBRACKET        shift and go to state 50
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
-    comando                        shift and go to state 53
-    atribuicao                     shift and go to state 43
-    comando_condicional            shift and go to state 44
-    comando_loop                   shift and go to state 45
-    bloco                          shift and go to state 46
-    declaracao_variaveis           shift and go to state 47
-    tipo                           shift and go to state 50
 
 state 42
 
-    (20) lista_comandos -> comando .
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET . expressao RBRACKET ATR expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    RCHAVE          reduce using rule 20 (lista_comandos -> comando .)
-    ID              reduce using rule 20 (lista_comandos -> comando .)
-    IF              reduce using rule 20 (lista_comandos -> comando .)
-    WHILE           reduce using rule 20 (lista_comandos -> comando .)
-    LCHAVE          reduce using rule 20 (lista_comandos -> comando .)
-    TIPO            reduce using rule 20 (lista_comandos -> comando .)
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
+    expressao                      shift and go to state 51
 
 state 43
 
-    (21) comando -> atribuicao .
+    (15) atribuicao -> ID LBRACKET expressao RBRACKET ATR . expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
 
-    RCHAVE          reduce using rule 21 (comando -> atribuicao .)
-    ID              reduce using rule 21 (comando -> atribuicao .)
-    IF              reduce using rule 21 (comando -> atribuicao .)
-    WHILE           reduce using rule 21 (comando -> atribuicao .)
-    LCHAVE          reduce using rule 21 (comando -> atribuicao .)
-    TIPO            reduce using rule 21 (comando -> atribuicao .)
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
 
+    expressao                      shift and go to state 52
 
 state 44
 
-    (22) comando -> comando_condicional .
+    (35) expressao -> expressao OPL expressao .
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    RCHAVE          reduce using rule 22 (comando -> comando_condicional .)
-    ID              reduce using rule 22 (comando -> comando_condicional .)
-    IF              reduce using rule 22 (comando -> comando_condicional .)
-    WHILE           reduce using rule 22 (comando -> comando_condicional .)
-    LCHAVE          reduce using rule 22 (comando -> comando_condicional .)
-    TIPO            reduce using rule 22 (comando -> comando_condicional .)
+  ! shift/reduce conflict for OPL resolved as shift
+  ! shift/reduce conflict for OPA resolved as shift
+    RBRACKET        reduce using rule 35 (expressao -> expressao OPL expressao .)
+    DELIMITADOR     reduce using rule 35 (expressao -> expressao OPL expressao .)
+    RPAREN          reduce using rule 35 (expressao -> expressao OPL expressao .)
+    LIBIMPORT       reduce using rule 35 (expressao -> expressao OPL expressao .)
+    ID              reduce using rule 35 (expressao -> expressao OPL expressao .)
+    TIPO            reduce using rule 35 (expressao -> expressao OPL expressao .)
+    $end            reduce using rule 35 (expressao -> expressao OPL expressao .)
+    RCHAVE          reduce using rule 35 (expressao -> expressao OPL expressao .)
+    IF              reduce using rule 35 (expressao -> expressao OPL expressao .)
+    WHILE           reduce using rule 35 (expressao -> expressao OPL expressao .)
+    LCHAVE          reduce using rule 35 (expressao -> expressao OPL expressao .)
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+  ! OPL             [ reduce using rule 35 (expressao -> expressao OPL expressao .) ]
+  ! OPA             [ reduce using rule 35 (expressao -> expressao OPL expressao .) ]
 
 
 state 45
 
-    (23) comando -> comando_loop .
+    (36) expressao -> expressao OPA expressao .
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    RCHAVE          reduce using rule 23 (comando -> comando_loop .)
-    ID              reduce using rule 23 (comando -> comando_loop .)
-    IF              reduce using rule 23 (comando -> comando_loop .)
-    WHILE           reduce using rule 23 (comando -> comando_loop .)
-    LCHAVE          reduce using rule 23 (comando -> comando_loop .)
-    TIPO            reduce using rule 23 (comando -> comando_loop .)
+  ! shift/reduce conflict for OPL resolved as shift
+  ! shift/reduce conflict for OPA resolved as shift
+    RBRACKET        reduce using rule 36 (expressao -> expressao OPA expressao .)
+    DELIMITADOR     reduce using rule 36 (expressao -> expressao OPA expressao .)
+    RPAREN          reduce using rule 36 (expressao -> expressao OPA expressao .)
+    LIBIMPORT       reduce using rule 36 (expressao -> expressao OPA expressao .)
+    ID              reduce using rule 36 (expressao -> expressao OPA expressao .)
+    TIPO            reduce using rule 36 (expressao -> expressao OPA expressao .)
+    $end            reduce using rule 36 (expressao -> expressao OPA expressao .)
+    RCHAVE          reduce using rule 36 (expressao -> expressao OPA expressao .)
+    IF              reduce using rule 36 (expressao -> expressao OPA expressao .)
+    WHILE           reduce using rule 36 (expressao -> expressao OPA expressao .)
+    LCHAVE          reduce using rule 36 (expressao -> expressao OPA expressao .)
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+  ! OPL             [ reduce using rule 36 (expressao -> expressao OPA expressao .) ]
+  ! OPA             [ reduce using rule 36 (expressao -> expressao OPA expressao .) ]
 
 
 state 46
 
-    (24) comando -> bloco .
+    (37) expressao -> LPAREN expressao RPAREN .
 
-    RCHAVE          reduce using rule 24 (comando -> bloco .)
-    ID              reduce using rule 24 (comando -> bloco .)
-    IF              reduce using rule 24 (comando -> bloco .)
-    WHILE           reduce using rule 24 (comando -> bloco .)
-    LCHAVE          reduce using rule 24 (comando -> bloco .)
-    TIPO            reduce using rule 24 (comando -> bloco .)
+    RBRACKET        reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    OPL             reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    OPA             reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    DELIMITADOR     reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    RPAREN          reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    LIBIMPORT       reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    ID              reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    TIPO            reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    $end            reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    RCHAVE          reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    IF              reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    WHILE           reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
+    LCHAVE          reduce using rule 37 (expressao -> LPAREN expressao RPAREN .)
 
 
 state 47
 
-    (25) comando -> declaracao_variaveis .
+    (11) declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .
 
-    RCHAVE          reduce using rule 25 (comando -> declaracao_variaveis .)
-    ID              reduce using rule 25 (comando -> declaracao_variaveis .)
-    IF              reduce using rule 25 (comando -> declaracao_variaveis .)
-    WHILE           reduce using rule 25 (comando -> declaracao_variaveis .)
-    LCHAVE          reduce using rule 25 (comando -> declaracao_variaveis .)
-    TIPO            reduce using rule 25 (comando -> declaracao_variaveis .)
+    LIBIMPORT       reduce using rule 11 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
+    ID              reduce using rule 11 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
+    TIPO            reduce using rule 11 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
+    $end            reduce using rule 11 (declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco .)
 
 
 state 48
 
-    (27) comando_condicional -> IF . LPAREN expressao RPAREN bloco
+    (24) bloco -> LCHAVE . lista_comandos RCHAVE
+    (25) lista_comandos -> . lista_comandos comando
+    (26) lista_comandos -> . comando
+    (27) comando -> . atribuicao
+    (28) comando -> . comando_condicional
+    (29) comando -> . comando_loop
+    (30) comando -> . bloco
+    (31) comando -> . declaracao_variaveis
+    (15) atribuicao -> . ID LBRACKET expressao RBRACKET ATR expressao
+    (16) atribuicao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (32) atribuicao -> . ID ATR expressao DELIMITADOR
+    (33) comando_condicional -> . IF LPAREN expressao RPAREN bloco
+    (34) comando_loop -> . WHILE LPAREN expressao RPAREN bloco
+    (24) bloco -> . LCHAVE lista_comandos RCHAVE
+    (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
+    (9) declaracao_variaveis -> . tipo ID VECTOR
+    (10) declaracao_variaveis -> . tipo ID MATRIX
+    (17) tipo -> . TIPO
 
-    LPAREN          shift and go to state 54
+    ID              shift and go to state 9
+    IF              shift and go to state 60
+    WHILE           shift and go to state 61
+    LCHAVE          shift and go to state 48
+    TIPO            shift and go to state 11
 
+    lista_comandos                 shift and go to state 53
+    comando                        shift and go to state 54
+    atribuicao                     shift and go to state 55
+    comando_condicional            shift and go to state 56
+    comando_loop                   shift and go to state 57
+    bloco                          shift and go to state 58
+    declaracao_variaveis           shift and go to state 59
+    tipo                           shift and go to state 62
 
 state 49
 
-    (28) comando_loop -> WHILE . LPAREN expressao RPAREN bloco
+    (22) lista_parametros -> lista_parametros , tipo . ID
 
-    LPAREN          shift and go to state 55
+    ID              shift and go to state 63
 
 
 state 50
 
-    (8) declaracao_variaveis -> tipo . lista_variaveis DELIMITADOR
-    (12) lista_variaveis -> . lista_variaveis , ID
-    (13) lista_variaveis -> . ID
+    (13) expressao -> ID LBRACKET expressao RBRACKET .
+    (14) expressao -> ID LBRACKET expressao RBRACKET . LBRACKET expressao RBRACKET
 
-    ID              shift and go to state 56
+    RBRACKET        reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    OPL             reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    OPA             reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    DELIMITADOR     reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    RPAREN          reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    LIBIMPORT       reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    ID              reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    TIPO            reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    $end            reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    RCHAVE          reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    IF              reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    WHILE           reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    LCHAVE          reduce using rule 13 (expressao -> ID LBRACKET expressao RBRACKET .)
+    LBRACKET        shift and go to state 64
 
-    lista_variaveis                shift and go to state 13
 
 state 51
 
-    (16) lista_parametros -> lista_parametros , tipo ID .
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao . RBRACKET ATR expressao
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    ,               reduce using rule 16 (lista_parametros -> lista_parametros , tipo ID .)
-    RPAREN          reduce using rule 16 (lista_parametros -> lista_parametros , tipo ID .)
+    RBRACKET        shift and go to state 65
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
 
 state 52
 
-    (18) bloco -> LCHAVE lista_comandos RCHAVE .
+    (15) atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
 
-    LIBIMPORT       reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    ID              reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    TIPO            reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    $end            reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    RCHAVE          reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    IF              reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    WHILE           reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
-    LCHAVE          reduce using rule 18 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    LIBIMPORT       reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    ID              reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    TIPO            reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    $end            reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    RCHAVE          reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    IF              reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    WHILE           reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    LCHAVE          reduce using rule 15 (atribuicao -> ID LBRACKET expressao RBRACKET ATR expressao .)
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
 
 
 state 53
 
-    (19) lista_comandos -> lista_comandos comando .
+    (24) bloco -> LCHAVE lista_comandos . RCHAVE
+    (25) lista_comandos -> lista_comandos . comando
+    (27) comando -> . atribuicao
+    (28) comando -> . comando_condicional
+    (29) comando -> . comando_loop
+    (30) comando -> . bloco
+    (31) comando -> . declaracao_variaveis
+    (15) atribuicao -> . ID LBRACKET expressao RBRACKET ATR expressao
+    (16) atribuicao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao
+    (32) atribuicao -> . ID ATR expressao DELIMITADOR
+    (33) comando_condicional -> . IF LPAREN expressao RPAREN bloco
+    (34) comando_loop -> . WHILE LPAREN expressao RPAREN bloco
+    (24) bloco -> . LCHAVE lista_comandos RCHAVE
+    (8) declaracao_variaveis -> . tipo lista_variaveis DELIMITADOR
+    (9) declaracao_variaveis -> . tipo ID VECTOR
+    (10) declaracao_variaveis -> . tipo ID MATRIX
+    (17) tipo -> . TIPO
 
-    RCHAVE          reduce using rule 19 (lista_comandos -> lista_comandos comando .)
-    ID              reduce using rule 19 (lista_comandos -> lista_comandos comando .)
-    IF              reduce using rule 19 (lista_comandos -> lista_comandos comando .)
-    WHILE           reduce using rule 19 (lista_comandos -> lista_comandos comando .)
-    LCHAVE          reduce using rule 19 (lista_comandos -> lista_comandos comando .)
-    TIPO            reduce using rule 19 (lista_comandos -> lista_comandos comando .)
+    RCHAVE          shift and go to state 66
+    ID              shift and go to state 9
+    IF              shift and go to state 60
+    WHILE           shift and go to state 61
+    LCHAVE          shift and go to state 48
+    TIPO            shift and go to state 11
 
+    comando                        shift and go to state 67
+    atribuicao                     shift and go to state 55
+    comando_condicional            shift and go to state 56
+    comando_loop                   shift and go to state 57
+    bloco                          shift and go to state 58
+    declaracao_variaveis           shift and go to state 59
+    tipo                           shift and go to state 62
 
 state 54
 
-    (27) comando_condicional -> IF LPAREN . expressao RPAREN bloco
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (26) lista_comandos -> comando .
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    RCHAVE          reduce using rule 26 (lista_comandos -> comando .)
+    ID              reduce using rule 26 (lista_comandos -> comando .)
+    IF              reduce using rule 26 (lista_comandos -> comando .)
+    WHILE           reduce using rule 26 (lista_comandos -> comando .)
+    LCHAVE          reduce using rule 26 (lista_comandos -> comando .)
+    TIPO            reduce using rule 26 (lista_comandos -> comando .)
 
-    expressao                      shift and go to state 57
 
 state 55
 
-    (28) comando_loop -> WHILE LPAREN . expressao RPAREN bloco
-    (29) expressao -> . expressao OPL expressao
-    (30) expressao -> . expressao OPA expressao
-    (31) expressao -> . LPAREN expressao RPAREN
-    (32) expressao -> . ID
-    (33) expressao -> . NUMERO
+    (27) comando -> atribuicao .
 
-    LPAREN          shift and go to state 21
-    ID              shift and go to state 19
-    NUMERO          shift and go to state 22
+    RCHAVE          reduce using rule 27 (comando -> atribuicao .)
+    ID              reduce using rule 27 (comando -> atribuicao .)
+    IF              reduce using rule 27 (comando -> atribuicao .)
+    WHILE           reduce using rule 27 (comando -> atribuicao .)
+    LCHAVE          reduce using rule 27 (comando -> atribuicao .)
+    TIPO            reduce using rule 27 (comando -> atribuicao .)
 
-    expressao                      shift and go to state 58
 
 state 56
 
-    (13) lista_variaveis -> ID .
+    (28) comando -> comando_condicional .
 
-    DELIMITADOR     reduce using rule 13 (lista_variaveis -> ID .)
-    ,               reduce using rule 13 (lista_variaveis -> ID .)
+    RCHAVE          reduce using rule 28 (comando -> comando_condicional .)
+    ID              reduce using rule 28 (comando -> comando_condicional .)
+    IF              reduce using rule 28 (comando -> comando_condicional .)
+    WHILE           reduce using rule 28 (comando -> comando_condicional .)
+    LCHAVE          reduce using rule 28 (comando -> comando_condicional .)
+    TIPO            reduce using rule 28 (comando -> comando_condicional .)
 
 
 state 57
 
-    (27) comando_condicional -> IF LPAREN expressao . RPAREN bloco
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (29) comando -> comando_loop .
 
-    RPAREN          shift and go to state 59
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
+    RCHAVE          reduce using rule 29 (comando -> comando_loop .)
+    ID              reduce using rule 29 (comando -> comando_loop .)
+    IF              reduce using rule 29 (comando -> comando_loop .)
+    WHILE           reduce using rule 29 (comando -> comando_loop .)
+    LCHAVE          reduce using rule 29 (comando -> comando_loop .)
+    TIPO            reduce using rule 29 (comando -> comando_loop .)
 
 
 state 58
 
-    (28) comando_loop -> WHILE LPAREN expressao . RPAREN bloco
-    (29) expressao -> expressao . OPL expressao
-    (30) expressao -> expressao . OPA expressao
+    (30) comando -> bloco .
 
-    RPAREN          shift and go to state 60
-    OPL             shift and go to state 29
-    OPA             shift and go to state 30
+    RCHAVE          reduce using rule 30 (comando -> bloco .)
+    ID              reduce using rule 30 (comando -> bloco .)
+    IF              reduce using rule 30 (comando -> bloco .)
+    WHILE           reduce using rule 30 (comando -> bloco .)
+    LCHAVE          reduce using rule 30 (comando -> bloco .)
+    TIPO            reduce using rule 30 (comando -> bloco .)
 
 
 state 59
 
-    (27) comando_condicional -> IF LPAREN expressao RPAREN . bloco
-    (18) bloco -> . LCHAVE lista_comandos RCHAVE
+    (31) comando -> declaracao_variaveis .
 
-    LCHAVE          shift and go to state 39
+    RCHAVE          reduce using rule 31 (comando -> declaracao_variaveis .)
+    ID              reduce using rule 31 (comando -> declaracao_variaveis .)
+    IF              reduce using rule 31 (comando -> declaracao_variaveis .)
+    WHILE           reduce using rule 31 (comando -> declaracao_variaveis .)
+    LCHAVE          reduce using rule 31 (comando -> declaracao_variaveis .)
+    TIPO            reduce using rule 31 (comando -> declaracao_variaveis .)
 
-    bloco                          shift and go to state 61
 
 state 60
 
-    (28) comando_loop -> WHILE LPAREN expressao RPAREN . bloco
-    (18) bloco -> . LCHAVE lista_comandos RCHAVE
+    (33) comando_condicional -> IF . LPAREN expressao RPAREN bloco
 
-    LCHAVE          shift and go to state 39
+    LPAREN          shift and go to state 68
 
-    bloco                          shift and go to state 62
 
 state 61
 
-    (27) comando_condicional -> IF LPAREN expressao RPAREN bloco .
+    (34) comando_loop -> WHILE . LPAREN expressao RPAREN bloco
 
-    RCHAVE          reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
-    ID              reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
-    IF              reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
-    WHILE           reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
-    LCHAVE          reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
-    TIPO            reduce using rule 27 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    LPAREN          shift and go to state 69
 
 
 state 62
 
-    (28) comando_loop -> WHILE LPAREN expressao RPAREN bloco .
+    (8) declaracao_variaveis -> tipo . lista_variaveis DELIMITADOR
+    (9) declaracao_variaveis -> tipo . ID VECTOR
+    (10) declaracao_variaveis -> tipo . ID MATRIX
+    (18) lista_variaveis -> . lista_variaveis , ID
+    (19) lista_variaveis -> . ID
 
-    RCHAVE          reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
-    ID              reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
-    IF              reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
-    WHILE           reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
-    LCHAVE          reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
-    TIPO            reduce using rule 28 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    ID              shift and go to state 70
+
+    lista_variaveis                shift and go to state 13
+
+state 63
+
+    (22) lista_parametros -> lista_parametros , tipo ID .
+
+    ,               reduce using rule 22 (lista_parametros -> lista_parametros , tipo ID .)
+    RPAREN          reduce using rule 22 (lista_parametros -> lista_parametros , tipo ID .)
+
+
+state 64
+
+    (14) expressao -> ID LBRACKET expressao RBRACKET LBRACKET . expressao RBRACKET
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
+
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
+
+    expressao                      shift and go to state 71
+
+state 65
+
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET . ATR expressao
+
+    ATR             shift and go to state 72
+
+
+state 66
+
+    (24) bloco -> LCHAVE lista_comandos RCHAVE .
+
+    LIBIMPORT       reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    ID              reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    TIPO            reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    $end            reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    RCHAVE          reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    IF              reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    WHILE           reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+    LCHAVE          reduce using rule 24 (bloco -> LCHAVE lista_comandos RCHAVE .)
+
+
+state 67
+
+    (25) lista_comandos -> lista_comandos comando .
+
+    RCHAVE          reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+    ID              reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+    IF              reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+    WHILE           reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+    LCHAVE          reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+    TIPO            reduce using rule 25 (lista_comandos -> lista_comandos comando .)
+
+
+state 68
+
+    (33) comando_condicional -> IF LPAREN . expressao RPAREN bloco
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
+
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
+
+    expressao                      shift and go to state 73
+
+state 69
+
+    (34) comando_loop -> WHILE LPAREN . expressao RPAREN bloco
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
+
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
+
+    expressao                      shift and go to state 74
+
+state 70
+
+    (9) declaracao_variaveis -> tipo ID . VECTOR
+    (10) declaracao_variaveis -> tipo ID . MATRIX
+    (19) lista_variaveis -> ID .
+
+    VECTOR          shift and go to state 19
+    MATRIX          shift and go to state 20
+    DELIMITADOR     reduce using rule 19 (lista_variaveis -> ID .)
+    ,               reduce using rule 19 (lista_variaveis -> ID .)
+
+
+state 71
+
+    (14) expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao . RBRACKET
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
+
+    RBRACKET        shift and go to state 75
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+
+state 72
+
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR . expressao
+    (13) expressao -> . ID LBRACKET expressao RBRACKET
+    (14) expressao -> . ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+    (35) expressao -> . expressao OPL expressao
+    (36) expressao -> . expressao OPA expressao
+    (37) expressao -> . LPAREN expressao RPAREN
+    (38) expressao -> . ID
+    (39) expressao -> . NUMERO
+
+    ID              shift and go to state 22
+    LPAREN          shift and go to state 24
+    NUMERO          shift and go to state 25
+
+    expressao                      shift and go to state 76
+
+state 73
+
+    (33) comando_condicional -> IF LPAREN expressao . RPAREN bloco
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
+
+    RPAREN          shift and go to state 77
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+
+state 74
+
+    (34) comando_loop -> WHILE LPAREN expressao . RPAREN bloco
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
+
+    RPAREN          shift and go to state 78
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+
+state 75
+
+    (14) expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .
+
+    RBRACKET        reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    OPL             reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    OPA             reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    DELIMITADOR     reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    RPAREN          reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    LIBIMPORT       reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    ID              reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    TIPO            reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    $end            reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    RCHAVE          reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    IF              reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    WHILE           reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+    LCHAVE          reduce using rule 14 (expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET .)
+
+
+state 76
+
+    (16) atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .
+    (35) expressao -> expressao . OPL expressao
+    (36) expressao -> expressao . OPA expressao
+
+    LIBIMPORT       reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    ID              reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    TIPO            reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    $end            reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    RCHAVE          reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    IF              reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    WHILE           reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    LCHAVE          reduce using rule 16 (atribuicao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao .)
+    OPL             shift and go to state 34
+    OPA             shift and go to state 35
+
+
+state 77
+
+    (33) comando_condicional -> IF LPAREN expressao RPAREN . bloco
+    (24) bloco -> . LCHAVE lista_comandos RCHAVE
+
+    LCHAVE          shift and go to state 48
+
+    bloco                          shift and go to state 79
+
+state 78
+
+    (34) comando_loop -> WHILE LPAREN expressao RPAREN . bloco
+    (24) bloco -> . LCHAVE lista_comandos RCHAVE
+
+    LCHAVE          shift and go to state 48
+
+    bloco                          shift and go to state 80
+
+state 79
+
+    (33) comando_condicional -> IF LPAREN expressao RPAREN bloco .
+
+    RCHAVE          reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    ID              reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    IF              reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    WHILE           reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    LCHAVE          reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+    TIPO            reduce using rule 33 (comando_condicional -> IF LPAREN expressao RPAREN bloco .)
+
+
+state 80
+
+    (34) comando_loop -> WHILE LPAREN expressao RPAREN bloco .
+
+    RCHAVE          reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    ID              reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    IF              reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    WHILE           reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    LCHAVE          reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
+    TIPO            reduce using rule 34 (comando_loop -> WHILE LPAREN expressao RPAREN bloco .)
 
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for OPL in state 35 resolved as shift
-WARNING: shift/reduce conflict for OPA in state 35 resolved as shift
-WARNING: shift/reduce conflict for OPL in state 36 resolved as shift
-WARNING: shift/reduce conflict for OPA in state 36 resolved as shift
+WARNING: shift/reduce conflict for OPL in state 44 resolved as shift
+WARNING: shift/reduce conflict for OPA in state 44 resolved as shift
+WARNING: shift/reduce conflict for OPL in state 45 resolved as shift
+WARNING: shift/reduce conflict for OPA in state 45 resolved as shift

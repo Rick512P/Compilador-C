@@ -6,7 +6,7 @@ import ply.yacc as yacc
 tokens = [
     'OPA', 'OPL', 'DELIMITADOR', 'ATR', 'ID', 'NUMERO', 
     'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
-    'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET'
+    'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET', 'VECTOR', 'MATRIX'
 ] + list({
     'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
 })
@@ -43,6 +43,8 @@ t_LCHAVE = r'\{'
 t_RCHAVE = r'\}'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
+t_VECTOR = r'\[\d*\]'
+t_MATRIX = r'\[\d+\]\[\d+\]'  # Reconhece formatos como [3][4]
 t_STRING = r'"(\\.|[^"\\])*"|\'(\\.|[^\'\\])*\''  # Strings (simples ou duplas)
 t_LIBIMPORT = r'\#(include|import)\s*<[^>]+>'  # Diretiva de importação de biblioteca
 t_DEFINE = r'\#define'  # Diretiva de definição
@@ -97,6 +99,14 @@ def p_declaracao_variaveis(p):
     """declaracao_variaveis : tipo lista_variaveis DELIMITADOR"""
     p[0] = ('var_declaration', p[1], p[2])
 
+def p_declaracao_variaveis_vetor(p):
+    """declaracao_variaveis : tipo ID VECTOR"""
+    p[0] = ('vector_declaration', p[1], p[2], p[3])  # tipo, nome, tamanho
+
+def p_declaracao_variaveis_matriz(p):
+    """declaracao_variaveis : tipo ID MATRIX"""
+    p[0] = ('matrix_declaration', p[1], p[2], p[3])  # tipo, nome, dimensões
+
 def p_declaracao_funcao(p):
     """declaracao_funcao : tipo ID LPAREN parametros RPAREN bloco"""
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
@@ -108,6 +118,21 @@ def p_declaracao_preprocessador(p):
     biblioteca = p[1].split('<')[1].split('>')[0]  # Extrai o nome do arquivo entre '<' e '>'
     p[0] = ('include', biblioteca)
 
+def p_expressao_vetor(p):
+    """expressao : ID LBRACKET expressao RBRACKET"""
+    p[0] = ('vector_access', p[1], p[3])  # nome, índice
+
+def p_expressao_matriz(p):
+    """expressao : ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET"""
+    p[0] = ('matrix_access', p[1], p[3], p[6])  # nome, índice1, índice2
+
+def p_atribuicao_vetor(p):
+    """atribuicao : ID LBRACKET expressao RBRACKET ATR expressao"""
+    p[0] = ('vector_assign', p[1], p[3], p[6])  # nome, índice, valor
+
+def p_atribuicao_matriz(p):
+    """atribuicao : ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao"""
+    p[0] = ('matrix_assign', p[1], p[3], p[6], p[9])  # nome, índice1, índice2, valor
 
 def p_tipo(p):
     """tipo : TIPO"""
@@ -206,14 +231,50 @@ def verificar_opl_contexto(tokens):
             else:
                 print(f"'{tok.value}' identificado como operador de comparação (linha {tok.lineno}).")
 
+def verificar_vetores(tokens):
+    """
+    Verifica o uso correto de vetores (declaração e acesso).
+    """
+    for i, tok in enumerate(tokens):
+        if tok.type == 'VECTOR':
+            # Caso seja uma declaração de vetor
+            if i > 0 and tokens[i - 1].type == 'ID':
+                print(f"Vetor declarado corretamente: {tokens[i-1].value}{tok.value} (linha {tok.lineno}).")
+            # Caso seja acesso a um vetor
+            elif i > 0 and tokens[i - 1].type == 'LBRACKET':
+                print(f"Acesso ao vetor identificado: índice {tok.value} (linha {tok.lineno}).")
+            else:
+                print(f"Uso inválido de vetor (linha {tok.lineno}).")
+
+def verificar_matrizes(tokens):
+    """
+    Verifica o uso correto de matrizes (declaração e acesso).
+    """
+    for i, tok in enumerate(tokens):
+        if tok.type == 'MATRIX':
+            # Caso seja uma declaração de matriz
+            if i > 0 and tokens[i - 1].type == 'ID':
+                print(f"Matriz declarada corretamente: {tokens[i-1].value}{tok.value} (linha {tok.lineno}).")
+            # Caso seja acesso à matriz
+            elif i > 0 and tokens[i - 1].type == 'LBRACKET':
+                print(f"Acesso à matriz identificado: índices {tok.value} (linha {tok.lineno}).")
+            else:
+                print(f"Uso inválido de matriz (linha {tok.lineno}).")
+
 def analisar_entrada(entrada):
     entrada = preprocess_code(entrada)
     lexer.input(entrada)
+
     print("\nTokens identificados:")
+    tokens = []
     tok = lexer.token()
     while tok:
+        tokens.append(tok)
         print(tok)
         tok = lexer.token()
+
+    verificar_vetores(tokens)  # Verificação de vetores
+    verificar_matrizes(tokens)  # Verificação de matrizes
 
     print("\nAnálise sintática:")
     resultado = parser.parse(entrada, lexer=lexer)
@@ -226,6 +287,7 @@ def analisar_entrada(entrada):
     else:
         print("\nErro na geração da árvore.")
         return None
+
 
 def main():
     #opcao = input("Deseja fornecer uma expressão (E) ou um arquivo (A)? ").strip().upper()

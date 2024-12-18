@@ -1,1 +1,4 @@
-#include <stdio.h>
+int vetor[10];
+float matriz[10][20];
+vetor[5] = 10;
+printf(matriz[2][3]);

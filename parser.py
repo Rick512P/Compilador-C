@@ -44,7 +44,7 @@ t_RCHAVE = r'\}'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
 t_STRING = r'"(\\.|[^"\\])*"|\'(\\.|[^\'\\])*\''  # Strings (simples ou duplas)
-t_LIBIMPORT = r'\#include'  # Diretiva de importação de biblioteca
+t_LIBIMPORT = r'\#(include|import)\s*<[^>]+>'  # Diretiva de importação de biblioteca
 t_DEFINE = r'\#define'  # Diretiva de definição
 t_ATR = r'='  # Atribuição
 t_COMENTARIO = r'(\/\/.*|\/\*[\s\S]*?\*\/)'  # Comentários
@@ -102,8 +102,12 @@ def p_declaracao_funcao(p):
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
 
 def p_declaracao_preprocessador(p):
-    """declaracao_preprocessador : LIBIMPORT '<' ID '.' ID '>'"""
-    p[0] = ('include', f"{p[3]}.{p[5]}")
+    """declaracao_preprocessador : LIBIMPORT"""
+    # Aqui, p[1] conterá algo como "#include <stdio.h>", então podemos extrair
+    # o nome do arquivo que está dentro dos sinais de menor e maior.
+    biblioteca = p[1].split('<')[1].split('>')[0]  # Extrai o nome do arquivo entre '<' e '>'
+    p[0] = ('include', biblioteca)
+
 
 def p_tipo(p):
     """tipo : TIPO"""
@@ -189,6 +193,19 @@ def preprocess_code(code):
     code = re.sub(r'#define\s+\w+\s+\d+', '', code)
     return code
 
+def verificar_opl_contexto(tokens):
+    """
+    Verifica se os operadores '<' e '>' estão sendo usados como comparação ou delimitadores em #include.
+    """
+    for i, tok in enumerate(tokens):
+        if tok.type == 'OPL' and tok.value in ['<', '>']:
+            # Caso seja parte de um #include
+            if i > 0 and tokens[i - 1].type == 'LIBIMPORT':
+                print(f"'{tok.value}' identificado como delimitador de biblioteca (linha {tok.lineno}).")
+            # Caso seja usado como operador de comparação
+            else:
+                print(f"'{tok.value}' identificado como operador de comparação (linha {tok.lineno}).")
+
 def analisar_entrada(entrada):
     entrada = preprocess_code(entrada)
     lexer.input(entrada)
@@ -218,7 +235,7 @@ def main():
         analisar_entrada(entrada)
     elif opcao == 'A':
         #arquivo = input("Digite o caminho do arquivo: ").strip()
-        arquivo = "basico.c"
+        arquivo = "q.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()
