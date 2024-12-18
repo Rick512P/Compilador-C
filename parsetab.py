@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = "ATR BOOLEAN BOOLEAN CASE CASE CHAR COMENTARIO DEFINE DELIMITADOR DO DO ELSE ELSE FOR FOR ID IF IF LBRACKET LCHAVE LIBIMPORT LPAREN MATRIX NUMERO OPA OPL PRINT PRINT RBRACKET RCHAVE RPAREN STRING SWITCH SWITCH TIPO TIPO TIPO TIPO TIPO TIPO VECTOR WHILE WHILEprograma : lista_declaracoeslista_declaracoes : lista_declaracoes declaracao\n                          | declaracaodeclaracao : declaracao_variaveis\n                  | declaracao_funcao\n                  | declaracao_preprocessador\n                  | atribuicaodeclaracao_variaveis : tipo lista_variaveis DELIMITADOR\n                            | tipo ID VECTOR DELIMITADOR\n                            | tipo ID MATRIX DELIMITADORdeclaracao_funcao : tipo ID LPAREN parametros RPAREN blocodeclaracao_preprocessador : LIBIMPORTtipo : TIPOlista_variaveis : lista_variaveis ',' ID\n                        | IDparametros : lista_parametros\n                   | vaziolista_parametros : lista_parametros ',' tipo ID\n                         | tipo IDbloco : LCHAVE lista_comandos RCHAVElista_comandos : lista_comandos comando\n                      | comandocomando : atribuicao\n               | comando_condicional\n               | comando_loop\n               | bloco\n               | declaracao_variaveisatribuicao : ID ATR expressao DELIMITADOR\n                  | ID VECTOR ATR expressao DELIMITADOR\n                  | ID MATRIX ATR expressao DELIMITADORcomando_condicional : IF LPAREN expressao RPAREN blococomando_loop : WHILE LPAREN expressao RPAREN blocoexpressao : expressao OPL expressao\n                 | expressao OPA expressao\n                 | LPAREN expressao RPAREN\n                 | ID\n                 | NUMERO\n                 | ID LBRACKET expressao RBRACKET\n                 | ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET\n                 | PRINT LPAREN expressao RPARENvazio : "
+_lr_signature = "ASPAS ATR BOOLEAN BOOLEAN CASE CASE CHAR COMENTARIO DEFINE DELIMITADOR DO DO ELSE ELSE FOR FOR ID IF IF LBRACKET LCHAVE LIBIMPORT LPAREN MATRIX NUMERO OPA OPL PRINT PRINT RBRACKET RCHAVE RPAREN STRING SWITCH SWITCH TIPO TIPO TIPO TIPO TIPO TIPO VECTOR WHILE WHILEprograma : lista_declaracoeslista_declaracoes : lista_declaracoes declaracao\n                          | declaracaodeclaracao : declaracao_variaveis\n                  | declaracao_funcao\n                  | declaracao_preprocessador\n                  | atribuicaodeclaracao_variaveis : tipo lista_variaveis DELIMITADOR\n                            | tipo ID VECTOR DELIMITADOR\n                            | tipo ID MATRIX DELIMITADOR\n                            | tipo ID VECTOR ATR expressao DELIMITADOR\n                            | tipo ID MATRIX ATR expressao DELIMITADOR\n                            | tipo ID CHAR ATR expressao DELIMITADORdeclaracao_funcao : tipo ID LPAREN parametros RPAREN blocodeclaracao_preprocessador : LIBIMPORTtipo : TIPOlista_variaveis : lista_variaveis ',' ID\n                        | IDparametros : lista_parametros\n                   | vaziolista_parametros : lista_parametros ',' tipo ID\n                         | tipo IDbloco : LCHAVE lista_comandos RCHAVElista_comandos : lista_comandos comando\n                      | comandocomando : atribuicao\n               | comando_condicional\n               | comando_loop\n               | bloco\n               | declaracao_variaveis\n               | printatribuicao : ID ATR expressao DELIMITADOR\n                  | ID VECTOR ATR expressao DELIMITADOR\n                  | ID MATRIX ATR expressao DELIMITADOR\n                  | ID CHAR ATR ASPAS ID ASPAScomando_condicional : IF LPAREN expressao RPAREN blococomando_loop : WHILE LPAREN expressao RPAREN blocoprint : PRINT LPAREN expressao RPAREN DELIMITADORexpressao : expressao OPL expressao\n                 | expressao OPA expressao\n                 | LPAREN expressao RPAREN\n                 | ID\n                 | NUMERO\n                 | CHAR\n                 | STRING\n                 | ID LBRACKET expressao RBRACKET\n                 | ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET\n                 | DELIMITADORvazio : "
     
-_lr_action_items = {'LIBIMPORT':([0,2,3,4,5,6,7,10,12,18,31,32,38,53,54,55,72,],[10,10,-3,-4,-5,-6,-7,-12,-2,-8,-9,-10,-28,-29,-30,-11,-20,]),'ID':([0,2,3,4,5,6,7,8,10,11,12,15,18,19,25,28,29,31,32,33,37,38,39,40,42,53,54,55,56,57,60,61,62,63,64,65,66,69,71,72,73,74,75,83,84,],[9,9,-3,-4,-5,-6,-7,14,-12,-13,-2,23,-8,30,23,23,23,-9,-10,45,23,-28,23,23,23,-29,-30,-11,9,70,9,-22,-23,-24,-25,-26,-27,76,23,-20,-21,23,23,-31,-32,]),'TIPO':([0,2,3,4,5,6,7,10,12,18,22,31,32,38,47,53,54,55,56,60,61,62,63,64,65,66,72,73,83,84,],[11,11,-3,-4,-5,-6,-7,-12,-2,-8,11,-9,-10,-28,11,-29,-30,-11,11,11,-22,-23,-24,-25,-26,-27,-20,-21,-31,-32,]),'$end':([1,2,3,4,5,6,7,10,12,18,31,32,38,53,54,55,72,],[0,-1,-3,-4,-5,-6,-7,-12,-2,-8,-9,-10,-28,-29,-30,-11,-20,]),'ATR':([9,16,17,],[15,28,29,]),'VECTOR':([9,14,76,],[16,20,20,]),'MATRIX':([9,14,76,],[17,21,21,]),'DELIMITADOR':([13,14,20,21,23,24,26,30,43,44,49,50,51,58,59,76,80,],[18,-15,31,32,-36,38,-37,-14,53,54,-33,-34,-35,-38,-40,-15,-39,]),',':([13,14,30,35,45,70,76,],[19,-15,-14,47,-19,-18,-15,]),'LPAREN':([14,15,25,27,28,29,37,39,40,42,67,68,71,74,75,],[22,25,25,42,25,25,25,25,25,25,74,75,25,25,25,]),'NUMERO':([15,25,28,29,37,39,40,42,71,74,75,],[26,26,26,26,26,26,26,26,26,26,26,]),'PRINT':([15,25,28,29,37,39,40,42,71,74,75,],[27,27,27,27,27,27,27,27,27,27,27,]),'RCHAVE':([18,31,32,38,53,54,60,61,62,63,64,65,66,72,73,83,84,],[-8,-9,-10,-28,-29,-30,72,-22,-23,-24,-25,-26,-27,-20,-21,-31,-32,]),'IF':([18,31,32,38,53,54,56,60,61,62,63,64,65,66,72,73,83,84,],[-8,-9,-10,-28,-29,-30,67,67,-22,-23,-24,-25,-26,-27,-20,-21,-31,-32,]),'WHILE':([18,31,32,38,53,54,56,60,61,62,63,64,65,66,72,73,83,84,],[-8,-9,-10,-28,-29,-30,68,68,-22,-23,-24,-25,-26,-27,-20,-21,-31,-32,]),'LCHAVE':([18,31,32,38,46,53,54,56,60,61,62,63,64,65,66,72,73,81,82,83,84,],[-8,-9,-10,-28,56,-29,-30,56,56,-22,-23,-24,-25,-26,-27,-20,-21,56,56,-31,-32,]),'RPAREN':([22,23,26,34,35,36,41,45,49,50,51,52,58,59,70,78,79,80,],[-41,-36,-37,46,-16,-17,51,-19,-33,-34,-35,59,-38,-40,-18,81,82,-39,]),'OPL':([23,24,26,41,43,44,48,49,50,51,52,58,59,77,78,79,80,],[-36,39,-37,39,39,39,39,39,39,-35,39,-38,-40,39,39,39,-39,]),'OPA':([23,24,26,41,43,44,48,49,50,51,52,58,59,77,78,79,80,],[-36,40,-37,40,40,40,40,40,40,-35,40,-38,-40,40,40,40,-39,]),'RBRACKET':([23,26,48,49,50,51,58,59,77,80,],[-36,-37,58,-33,-34,-35,-38,-40,80,-39,]),'LBRACKET':([23,58,],[37,71,]),}
+_lr_action_items = {'LIBIMPORT':([0,2,3,4,5,6,7,10,12,19,36,38,46,63,64,66,67,68,69,73,88,],[10,10,-3,-4,-5,-6,-7,-15,-2,-8,-9,-10,-32,-33,-34,-11,-12,-13,-14,-35,-23,]),'ID':([0,2,3,4,5,6,7,8,10,11,12,15,19,20,28,32,33,36,37,38,39,40,41,45,46,47,48,52,63,64,66,67,68,69,70,71,73,74,75,76,77,78,79,80,81,84,87,88,89,90,91,93,102,103,104,],[9,9,-3,-4,-5,-6,-7,14,-15,-16,-2,25,-8,35,25,25,25,-9,25,-10,25,25,56,25,-32,25,25,65,-33,-34,-11,-12,-13,-14,9,86,-35,9,-25,-26,-27,-28,-29,-30,-31,92,25,-23,-24,25,25,25,-36,-37,-38,]),'TIPO':([0,2,3,4,5,6,7,10,12,19,24,36,38,46,58,63,64,66,67,68,69,70,73,74,75,76,77,78,79,80,81,88,89,102,103,104,],[11,11,-3,-4,-5,-6,-7,-15,-2,-8,11,-9,-10,-32,11,-33,-34,-11,-12,-13,-14,11,-35,11,-25,-26,-27,-28,-29,-30,-31,-23,-24,-36,-37,-38,]),'$end':([1,2,3,4,5,6,7,10,12,19,36,38,46,63,64,66,67,68,69,73,88,],[0,-1,-3,-4,-5,-6,-7,-15,-2,-8,-9,-10,-32,-33,-34,-11,-12,-13,-14,-35,-23,]),'ATR':([9,16,17,18,21,22,23,],[15,32,33,34,37,39,40,]),'VECTOR':([9,14,92,],[16,21,21,]),'MATRIX':([9,14,92,],[17,22,22,]),'CHAR':([9,14,15,28,32,33,37,39,40,45,47,48,87,90,91,92,93,],[18,23,30,30,30,30,30,30,30,30,30,30,30,30,30,23,30,]),'DELIMITADOR':([13,14,15,21,22,25,26,27,28,29,30,31,32,33,35,37,39,40,45,47,48,50,51,53,54,55,60,61,62,72,87,90,91,92,93,98,101,],[19,-18,27,36,38,-42,46,-48,27,-43,-44,-45,27,27,-17,27,27,27,27,27,27,63,64,66,67,68,-39,-40,-41,-46,27,27,27,-18,27,-47,104,]),',':([13,14,35,43,56,86,92,],[20,-18,-17,58,-22,-21,-18,]),'LPAREN':([14,15,28,32,33,37,39,40,45,47,48,82,83,85,87,90,91,93,],[24,28,28,28,28,28,28,28,28,28,28,90,91,93,28,28,28,28,]),'NUMERO':([15,28,32,33,37,39,40,45,47,48,87,90,91,93,],[29,29,29,29,29,29,29,29,29,29,29,29,29,29,]),'STRING':([15,28,32,33,37,39,40,45,47,48,87,90,91,93,],[31,31,31,31,31,31,31,31,31,31,31,31,31,31,]),'RCHAVE':([19,36,38,46,63,64,66,67,68,73,74,75,76,77,78,79,80,81,88,89,102,103,104,],[-8,-9,-10,-32,-33,-34,-11,-12,-13,-35,88,-25,-26,-27,-28,-29,-30,-31,-23,-24,-36,-37,-38,]),'IF':([19,36,38,46,63,64,66,67,68,70,73,74,75,76,77,78,79,80,81,88,89,102,103,104,],[-8,-9,-10,-32,-33,-34,-11,-12,-13,82,-35,82,-25,-26,-27,-28,-29,-30,-31,-23,-24,-36,-37,-38,]),'WHILE':([19,36,38,46,63,64,66,67,68,70,73,74,75,76,77,78,79,80,81,88,89,102,103,104,],[-8,-9,-10,-32,-33,-34,-11,-12,-13,83,-35,83,-25,-26,-27,-28,-29,-30,-31,-23,-24,-36,-37,-38,]),'LCHAVE':([19,36,38,46,57,63,64,66,67,68,70,73,74,75,76,77,78,79,80,81,88,89,99,100,102,103,104,],[-8,-9,-10,-32,70,-33,-34,-11,-12,-13,70,-35,70,-25,-26,-27,-28,-29,-30,-31,-23,-24,70,70,-36,-37,-38,]),'PRINT':([19,36,38,46,63,64,66,67,68,70,73,74,75,76,77,78,79,80,81,88,89,102,103,104,],[-8,-9,-10,-32,-33,-34,-11,-12,-13,85,-35,85,-25,-26,-27,-28,-29,-30,-31,-23,-24,-36,-37,-38,]),'RPAREN':([24,25,27,29,30,31,42,43,44,49,56,60,61,62,72,86,95,96,97,98,],[-49,-42,-48,-43,-44,-45,57,-19,-20,62,-22,-39,-40,-41,-46,-21,99,100,101,-47,]),'OPL':([25,26,27,29,30,31,49,50,51,53,54,55,59,60,61,62,72,94,95,96,97,98,],[-42,47,-48,-43,-44,-45,47,47,47,47,47,47,47,47,47,-41,-46,47,47,47,47,-47,]),'OPA':([25,26,27,29,30,31,49,50,51,53,54,55,59,60,61,62,72,94,95,96,97,98,],[-42,48,-48,-43,-44,-45,48,48,48,48,48,48,48,48,48,-41,-46,48,48,48,48,-47,]),'RBRACKET':([25,27,29,30,31,59,60,61,62,72,94,98,],[-42,-48,-43,-44,-45,72,-39,-40,-41,-46,98,-47,]),'LBRACKET':([25,72,],[45,87,]),'ASPAS':([34,65,],[52,73,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'programa':([0,],[1,]),'lista_declaracoes':([0,],[2,]),'declaracao':([0,2,],[3,12,]),'declaracao_variaveis':([0,2,56,60,],[4,4,66,66,]),'declaracao_funcao':([0,2,],[5,5,]),'declaracao_preprocessador':([0,2,],[6,6,]),'atribuicao':([0,2,56,60,],[7,7,62,62,]),'tipo':([0,2,22,47,56,60,],[8,8,33,57,69,69,]),'lista_variaveis':([8,69,],[13,13,]),'expressao':([15,25,28,29,37,39,40,42,71,74,75,],[24,41,43,44,48,49,50,52,77,78,79,]),'parametros':([22,],[34,]),'lista_parametros':([22,],[35,]),'vazio':([22,],[36,]),'bloco':([46,56,60,81,82,],[55,65,65,83,84,]),'lista_comandos':([56,],[60,]),'comando':([56,60,],[61,73,]),'comando_condicional':([56,60,],[63,63,]),'comando_loop':([56,60,],[64,64,]),}
+_lr_goto_items = {'programa':([0,],[1,]),'lista_declaracoes':([0,],[2,]),'declaracao':([0,2,],[3,12,]),'declaracao_variaveis':([0,2,70,74,],[4,4,80,80,]),'declaracao_funcao':([0,2,],[5,5,]),'declaracao_preprocessador':([0,2,],[6,6,]),'atribuicao':([0,2,70,74,],[7,7,76,76,]),'tipo':([0,2,24,58,70,74,],[8,8,41,71,84,84,]),'lista_variaveis':([8,84,],[13,13,]),'expressao':([15,28,32,33,37,39,40,45,47,48,87,90,91,93,],[26,49,50,51,53,54,55,59,60,61,94,95,96,97,]),'parametros':([24,],[42,]),'lista_parametros':([24,],[43,]),'vazio':([24,],[44,]),'bloco':([57,70,74,99,100,],[69,79,79,102,103,]),'lista_comandos':([70,],[74,]),'comando':([70,74,],[75,89,]),'comando_condicional':([70,74,],[77,77,]),'comando_loop':([70,74,],[78,78,]),'print':([70,74,],[81,81,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,45 +27,53 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> programa","S'",1,None,None,None),
-  ('programa -> lista_declaracoes','programa',1,'p_programa','parser_testes.py',88),
-  ('lista_declaracoes -> lista_declaracoes declaracao','lista_declaracoes',2,'p_lista_declaracoes','parser_testes.py',92),
-  ('lista_declaracoes -> declaracao','lista_declaracoes',1,'p_lista_declaracoes','parser_testes.py',93),
-  ('declaracao -> declaracao_variaveis','declaracao',1,'p_declaracao','parser_testes.py',97),
-  ('declaracao -> declaracao_funcao','declaracao',1,'p_declaracao','parser_testes.py',98),
-  ('declaracao -> declaracao_preprocessador','declaracao',1,'p_declaracao','parser_testes.py',99),
-  ('declaracao -> atribuicao','declaracao',1,'p_declaracao','parser_testes.py',100),
-  ('declaracao_variaveis -> tipo lista_variaveis DELIMITADOR','declaracao_variaveis',3,'p_declaracao_variaveis','parser_testes.py',104),
-  ('declaracao_variaveis -> tipo ID VECTOR DELIMITADOR','declaracao_variaveis',4,'p_declaracao_variaveis','parser_testes.py',105),
-  ('declaracao_variaveis -> tipo ID MATRIX DELIMITADOR','declaracao_variaveis',4,'p_declaracao_variaveis','parser_testes.py',106),
-  ('declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco','declaracao_funcao',6,'p_declaracao_funcao','parser_testes.py',124),
-  ('declaracao_preprocessador -> LIBIMPORT','declaracao_preprocessador',1,'p_declaracao_preprocessador','parser_testes.py',128),
-  ('tipo -> TIPO','tipo',1,'p_tipo','parser_testes.py',151),
-  ('lista_variaveis -> lista_variaveis , ID','lista_variaveis',3,'p_lista_variaveis','parser_testes.py',155),
-  ('lista_variaveis -> ID','lista_variaveis',1,'p_lista_variaveis','parser_testes.py',156),
-  ('parametros -> lista_parametros','parametros',1,'p_parametros','parser_testes.py',160),
-  ('parametros -> vazio','parametros',1,'p_parametros','parser_testes.py',161),
-  ('lista_parametros -> lista_parametros , tipo ID','lista_parametros',4,'p_lista_parametros','parser_testes.py',165),
-  ('lista_parametros -> tipo ID','lista_parametros',2,'p_lista_parametros','parser_testes.py',166),
-  ('bloco -> LCHAVE lista_comandos RCHAVE','bloco',3,'p_bloco','parser_testes.py',170),
-  ('lista_comandos -> lista_comandos comando','lista_comandos',2,'p_lista_comandos','parser_testes.py',174),
-  ('lista_comandos -> comando','lista_comandos',1,'p_lista_comandos','parser_testes.py',175),
-  ('comando -> atribuicao','comando',1,'p_comando','parser_testes.py',179),
-  ('comando -> comando_condicional','comando',1,'p_comando','parser_testes.py',180),
-  ('comando -> comando_loop','comando',1,'p_comando','parser_testes.py',181),
-  ('comando -> bloco','comando',1,'p_comando','parser_testes.py',182),
-  ('comando -> declaracao_variaveis','comando',1,'p_comando','parser_testes.py',183),
-  ('atribuicao -> ID ATR expressao DELIMITADOR','atribuicao',4,'p_atribuicao','parser_testes.py',187),
-  ('atribuicao -> ID VECTOR ATR expressao DELIMITADOR','atribuicao',5,'p_atribuicao','parser_testes.py',188),
-  ('atribuicao -> ID MATRIX ATR expressao DELIMITADOR','atribuicao',5,'p_atribuicao','parser_testes.py',189),
-  ('comando_condicional -> IF LPAREN expressao RPAREN bloco','comando_condicional',5,'p_comando_condicional','parser_testes.py',199),
-  ('comando_loop -> WHILE LPAREN expressao RPAREN bloco','comando_loop',5,'p_comando_loop','parser_testes.py',205),
-  ('expressao -> expressao OPL expressao','expressao',3,'p_expressao','parser_testes.py',209),
-  ('expressao -> expressao OPA expressao','expressao',3,'p_expressao','parser_testes.py',210),
-  ('expressao -> LPAREN expressao RPAREN','expressao',3,'p_expressao','parser_testes.py',211),
-  ('expressao -> ID','expressao',1,'p_expressao','parser_testes.py',212),
-  ('expressao -> NUMERO','expressao',1,'p_expressao','parser_testes.py',213),
-  ('expressao -> ID LBRACKET expressao RBRACKET','expressao',4,'p_expressao','parser_testes.py',214),
-  ('expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET','expressao',7,'p_expressao','parser_testes.py',215),
-  ('expressao -> PRINT LPAREN expressao RPAREN','expressao',4,'p_expressao','parser_testes.py',216),
-  ('vazio -> <empty>','vazio',0,'p_vazio','parser_testes.py',228),
+  ('programa -> lista_declaracoes','programa',1,'p_programa','parser_testes.py',89),
+  ('lista_declaracoes -> lista_declaracoes declaracao','lista_declaracoes',2,'p_lista_declaracoes','parser_testes.py',93),
+  ('lista_declaracoes -> declaracao','lista_declaracoes',1,'p_lista_declaracoes','parser_testes.py',94),
+  ('declaracao -> declaracao_variaveis','declaracao',1,'p_declaracao','parser_testes.py',98),
+  ('declaracao -> declaracao_funcao','declaracao',1,'p_declaracao','parser_testes.py',99),
+  ('declaracao -> declaracao_preprocessador','declaracao',1,'p_declaracao','parser_testes.py',100),
+  ('declaracao -> atribuicao','declaracao',1,'p_declaracao','parser_testes.py',101),
+  ('declaracao_variaveis -> tipo lista_variaveis DELIMITADOR','declaracao_variaveis',3,'p_declaracao_variaveis','parser_testes.py',105),
+  ('declaracao_variaveis -> tipo ID VECTOR DELIMITADOR','declaracao_variaveis',4,'p_declaracao_variaveis','parser_testes.py',106),
+  ('declaracao_variaveis -> tipo ID MATRIX DELIMITADOR','declaracao_variaveis',4,'p_declaracao_variaveis','parser_testes.py',107),
+  ('declaracao_variaveis -> tipo ID VECTOR ATR expressao DELIMITADOR','declaracao_variaveis',6,'p_declaracao_variaveis','parser_testes.py',108),
+  ('declaracao_variaveis -> tipo ID MATRIX ATR expressao DELIMITADOR','declaracao_variaveis',6,'p_declaracao_variaveis','parser_testes.py',109),
+  ('declaracao_variaveis -> tipo ID CHAR ATR expressao DELIMITADOR','declaracao_variaveis',6,'p_declaracao_variaveis','parser_testes.py',110),
+  ('declaracao_funcao -> tipo ID LPAREN parametros RPAREN bloco','declaracao_funcao',6,'p_declaracao_funcao','parser_testes.py',119),
+  ('declaracao_preprocessador -> LIBIMPORT','declaracao_preprocessador',1,'p_declaracao_preprocessador','parser_testes.py',123),
+  ('tipo -> TIPO','tipo',1,'p_tipo','parser_testes.py',131),
+  ('lista_variaveis -> lista_variaveis , ID','lista_variaveis',3,'p_lista_variaveis','parser_testes.py',135),
+  ('lista_variaveis -> ID','lista_variaveis',1,'p_lista_variaveis','parser_testes.py',136),
+  ('parametros -> lista_parametros','parametros',1,'p_parametros','parser_testes.py',140),
+  ('parametros -> vazio','parametros',1,'p_parametros','parser_testes.py',141),
+  ('lista_parametros -> lista_parametros , tipo ID','lista_parametros',4,'p_lista_parametros','parser_testes.py',145),
+  ('lista_parametros -> tipo ID','lista_parametros',2,'p_lista_parametros','parser_testes.py',146),
+  ('bloco -> LCHAVE lista_comandos RCHAVE','bloco',3,'p_bloco','parser_testes.py',150),
+  ('lista_comandos -> lista_comandos comando','lista_comandos',2,'p_lista_comandos','parser_testes.py',154),
+  ('lista_comandos -> comando','lista_comandos',1,'p_lista_comandos','parser_testes.py',155),
+  ('comando -> atribuicao','comando',1,'p_comando','parser_testes.py',159),
+  ('comando -> comando_condicional','comando',1,'p_comando','parser_testes.py',160),
+  ('comando -> comando_loop','comando',1,'p_comando','parser_testes.py',161),
+  ('comando -> bloco','comando',1,'p_comando','parser_testes.py',162),
+  ('comando -> declaracao_variaveis','comando',1,'p_comando','parser_testes.py',163),
+  ('comando -> print','comando',1,'p_comando','parser_testes.py',164),
+  ('atribuicao -> ID ATR expressao DELIMITADOR','atribuicao',4,'p_atribuicao','parser_testes.py',168),
+  ('atribuicao -> ID VECTOR ATR expressao DELIMITADOR','atribuicao',5,'p_atribuicao','parser_testes.py',169),
+  ('atribuicao -> ID MATRIX ATR expressao DELIMITADOR','atribuicao',5,'p_atribuicao','parser_testes.py',170),
+  ('atribuicao -> ID CHAR ATR ASPAS ID ASPAS','atribuicao',6,'p_atribuicao','parser_testes.py',171),
+  ('comando_condicional -> IF LPAREN expressao RPAREN bloco','comando_condicional',5,'p_comando_condicional','parser_testes.py',181),
+  ('comando_loop -> WHILE LPAREN expressao RPAREN bloco','comando_loop',5,'p_comando_loop','parser_testes.py',187),
+  ('print -> PRINT LPAREN expressao RPAREN DELIMITADOR','print',5,'p_print','parser_testes.py',191),
+  ('expressao -> expressao OPL expressao','expressao',3,'p_expressao','parser_testes.py',196),
+  ('expressao -> expressao OPA expressao','expressao',3,'p_expressao','parser_testes.py',197),
+  ('expressao -> LPAREN expressao RPAREN','expressao',3,'p_expressao','parser_testes.py',198),
+  ('expressao -> ID','expressao',1,'p_expressao','parser_testes.py',199),
+  ('expressao -> NUMERO','expressao',1,'p_expressao','parser_testes.py',200),
+  ('expressao -> CHAR','expressao',1,'p_expressao','parser_testes.py',201),
+  ('expressao -> STRING','expressao',1,'p_expressao','parser_testes.py',202),
+  ('expressao -> ID LBRACKET expressao RBRACKET','expressao',4,'p_expressao','parser_testes.py',203),
+  ('expressao -> ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET','expressao',7,'p_expressao','parser_testes.py',204),
+  ('expressao -> DELIMITADOR','expressao',1,'p_expressao','parser_testes.py',205),
+  ('vazio -> <empty>','vazio',0,'p_vazio','parser_testes.py',219),
 ]

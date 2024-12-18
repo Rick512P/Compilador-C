@@ -223,7 +223,7 @@ def main():
     Função principal que lê o arquivo C, gera a árvore sintática
     e traduz para assembly MIPS, salvando o resultado em um arquivo .asm.
     """
-    entrada_c = 't.c'
+    entrada_c = 'basico.c'
     try:
         with open(entrada_c, 'r') as file:
             entrada = file.read()  # Lê o código-fonte
