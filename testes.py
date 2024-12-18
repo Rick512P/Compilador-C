@@ -18,7 +18,11 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
             # Gera código para a expressão no lado direito
             gerar_codigo_intermediario(no[2], codigo_intermediario)
             # Gera a instrução para armazenar o resultado na variável
-            instrucao = ('store', no[1])
+            instrucao = ('store', no[2], no[1])
+
+        elif no[0] == 'increment':  # Caso o nó seja um incremento
+            instrucao = ('increment', no[1])  # Adiciona a variável a ser incrementada
+            codigo_intermediario.append(instrucao)    
 
         elif no[0] in ('+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=', '&&', '||'):
             # Caso o nó seja uma operação aritmética ou lógica
@@ -26,7 +30,7 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
             gerar_codigo_intermediario(no[1], codigo_intermediario)
             gerar_codigo_intermediario(no[2], codigo_intermediario)
             # Gera a instrução da operação
-            instrucao = ('op', no[0])
+            instrucao = ('op', no[0], no[1], no[2])
 
         elif no[0] == 'if':  # Caso o nó seja uma instrução condicional
             # Gera código para a condição
@@ -53,14 +57,28 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
             instrucao = ('for', bloco_codigo)
 
         elif no[0] == 'while':  # Caso o nó seja um laço "while"
+            start_label = f"label_start_{len(codigo_intermediario)}"
+            end_label = f"label_end_{len(codigo_intermediario)}"
+            
+            # Adiciona o rótulo de início do laço
+            codigo_intermediario.append(('label', start_label))
+            
             # Gera código para a condição
             gerar_codigo_intermediario(no[1], codigo_intermediario)
-            bloco_codigo = []
-            # Itera sobre as instruções do corpo do laço
+            
+            # Gera a instrução para pular para o fim caso a condição seja falsa
+            codigo_intermediario.append(('jump_if_false', end_label))
+            
+            # Gera código para o corpo do laço
             for comando in no[2][1]:
-                gerar_codigo_intermediario(comando, bloco_codigo)
-            # Gera a instrução do laço "while"
-            instrucao = ('while', bloco_codigo)
+                gerar_codigo_intermediario(comando, codigo_intermediario)
+            
+            # Salta de volta para o início do laço
+            codigo_intermediario.append(('jump', start_label))
+            
+            # Adiciona o rótulo de fim do laço
+            codigo_intermediario.append(('label', end_label))
+
 
         elif no[0] == 'var_declaration':  # Declaração de variáveis
             # Gera instruções para cada variável declarada
@@ -75,6 +93,8 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
                 gerar_codigo_intermediario(comando, func_codigo)
             # Gera a instrução da função
             instrucao = ('function', no[2], no[3], func_codigo)
+
+        
 
         # Adiciona a instrução gerada ao código intermediário
         if instrucao:
@@ -122,13 +142,25 @@ def traduzir_para_mips(codigo_intermediario):
     registrador_atual = 0  # Índice do registrador disponível
     labels = 0  # Contador para etiquetas únicas
 
-    def novo_registrador():
+    def novo_registrador(x):
         """
         Retorna um novo registrador disponível para uso.
         """
+
         nonlocal registrador_atual
-        reg = f"$t{registrador_atual}"
-        registrador_atual = (registrador_atual + 1) % 10
+        reg = f"$t{registrador_atual}"  # Seleciona o registrador atual
+        registrador_atual = (registrador_atual + 1) % 10  # Atualiza o índice para o próximo registrador
+        printar = (f"sw {reg}, {x}")  # Gera a instrução de store
+        return reg, printar
+    
+    def novo_registrador_resultado():
+        """
+        Retorna um novo registrador disponível para uso.
+        """
+
+        nonlocal registrador_atual
+        reg = f"$t{registrador_atual}"  # Seleciona o registrador atual
+        registrador_atual = (registrador_atual + 1) % 10  # Atualiza o índice para o próximo registrador
         return reg
     
     def nova_label():
@@ -139,6 +171,7 @@ def traduzir_para_mips(codigo_intermediario):
         return lbl
 
     for instrucao in codigo_intermediario:
+        #print("Instrucao: ", instrucao)
         if instrucao[0] == 'function':  # Declaração de função
             nome_funcao = instrucao[1]
             parametros = instrucao[2]
@@ -148,9 +181,10 @@ def traduzir_para_mips(codigo_intermediario):
 
         elif instrucao[0] == 'store':  # Atribuição
             var = instrucao[1]
-            reg = registradores.get(var, novo_registrador())
+            var2 = instrucao[2]
+            reg = registradores.get(var, novo_registrador_resultado())
             registradores[var] = reg
-            mips_codigo.append(f"sw {reg}, {var}")
+            mips_codigo.append(f"sw {reg}, {var} # {var2}")
         elif instrucao[0] == 'op':  # Operação aritmética ou lógica
             operador = instrucao[1]
             mips_operadores = {
@@ -160,10 +194,12 @@ def traduzir_para_mips(codigo_intermediario):
             }
             operacao = mips_operadores.get(operador)
             if operacao:
-                op1 = novo_registrador()
-                op2 = novo_registrador()
-                resultado = novo_registrador()
-                mips_codigo.append(f"{operacao} {resultado}, {op1}, {op2}")
+                op1 = novo_registrador(instrucao[2])
+                op2 = novo_registrador(instrucao[3])
+                resultado = novo_registrador_resultado()
+                mips_codigo.append(f"{op1[1]}")
+                mips_codigo.append(f"{op2[1]}")
+                mips_codigo.append(f"{operacao} {resultado}, {op1[0]}, {op2[0]}")
         elif instrucao[0] == 'declare':  # Declaração de variáveis
             var = instrucao[2]
         elif instrucao[0] == 'if':  # Bloco condicional
@@ -176,6 +212,33 @@ def traduzir_para_mips(codigo_intermediario):
             mips_codigo.append(f"{label_else}:")
             mips_codigo.append(f"j {label_end}")
             mips_codigo.append(f"{label_end}:")
+
+        elif instrucao[0] == 'while':  # Laço "while"
+            start_label = nova_label()
+            end_label = nova_label()
+            # Adiciona o rótulo de início do laço
+            mips_codigo.append(f"{start_label}:")
+            # Gera código para a condição
+            mips_codigo.extend(traduzir_para_mips([instrucao[1]]))
+            # Salta para o fim se a condição for falsa
+            mips_codigo.append(f"beq $t0, $zero, {end_label}")
+            # Gera código para o corpo do laço
+            for cmd in instrucao[1]:
+                mips_codigo.extend(traduzir_para_mips([cmd]))
+            # Salta de volta para o início
+            mips_codigo.append(f"j {start_label}")
+            # Adiciona o rótulo de fim do laço
+            mips_codigo.append(f"{end_label}:")
+
+        elif instrucao[0] == 'label':  # Rótulos
+            mips_codigo.append(f"{instrucao[1]}:")
+        
+        elif instrucao[0] == 'jump':  # Salto incondicional
+            destino = instrucao[1]
+            mips_codigo.append(f"j {destino}")
+        
+        
+
 
     # Adiciona jumps aos blocos de código conforme necessário
     mips_codigo = adiciona_jump(mips_codigo)

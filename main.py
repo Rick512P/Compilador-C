@@ -1,5 +1,5 @@
 import os
-from parser import analisar_entrada
+from parser_testes import analisar_entrada
 
 def gerar_codigo_intermediario(no, codigo_intermediario):
     """

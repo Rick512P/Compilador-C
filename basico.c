@@ -1,6 +1,7 @@
 int f (int n) {
-    n = 0;
-    if (x == 0) {
+    
+    n = 1;
+    if (x  == 0) {
         float n;
         n=0;
     }
