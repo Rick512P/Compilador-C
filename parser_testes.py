@@ -8,11 +8,12 @@ tokens = [
     'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
     'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'RBRACKET', 'VECTOR', 'MATRIX'
 ] + list({
-    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR'
+    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR', 'PRINT'
 })
 
 # Palavras reservadas
 reserved = {
+    'printf': 'PRINT',
     'if': 'IF',
     'else': 'ELSE',
     'switch': 'SWITCH',
@@ -56,6 +57,10 @@ def t_ID(t):
     t.type = reserved.get(t.value, 'ID')  # Verifica se é uma palavra reservada
     return t
 
+def t_PRINT(t):
+    r'printf'
+    return t
+
 def t_NUMERO(t):
     r'\d+(\.\d+)?'
     t.value = float(t.value) if '.' in t.value else int(t.value)
@@ -96,16 +101,24 @@ def p_declaracao(p):
     p[0] = p[1]
 
 def p_declaracao_variaveis(p):
-    """declaracao_variaveis : tipo lista_variaveis DELIMITADOR"""
-    p[0] = ('var_declaration', p[1], p[2])
+    """declaracao_variaveis : tipo lista_variaveis DELIMITADOR
+                            | tipo ID VECTOR DELIMITADOR
+                            | tipo ID MATRIX DELIMITADOR"""
+    if len(p) == 4:  # Declaração de variáveis simples
+        p[0] = ('var_declaration', p[1], p[2])
+    elif len(p) == 5 and '[' in p[3]:  # Declaração de vetor
+        p[0] = ('vector_declaration', p[1], p[2], p[3])
+    elif len(p) == 5 and '][' in p[3]:  # Declaração de matriz
+        p[0] = ('matrix_declaration', p[1], p[2], p[3])
 
-def p_declaracao_variaveis_vetor(p):
-    """declaracao_variaveis : tipo ID VECTOR"""
-    p[0] = ('vector_declaration', p[1], p[2], p[3])  # tipo, nome, tamanho
 
-def p_declaracao_variaveis_matriz(p):
-    """declaracao_variaveis : tipo ID MATRIX"""
-    p[0] = ('matrix_declaration', p[1], p[2], p[3])  # tipo, nome, dimensões
+#def p_declaracao_variaveis_vetor(p):
+    #"""declaracao_variaveis : tipo ID VECTOR"""
+    #p[0] = ('vector_declaration', p[1], p[2], p[3])  # tipo, nome, tamanho
+
+#def p_declaracao_variaveis_matriz(p):
+    #"""declaracao_variaveis : tipo ID MATRIX"""
+    #p[0] = ('matrix_declaration', p[1], p[2], p[3])  # tipo, nome, dimensões
 
 def p_declaracao_funcao(p):
     """declaracao_funcao : tipo ID LPAREN parametros RPAREN bloco"""
@@ -118,21 +131,6 @@ def p_declaracao_preprocessador(p):
     biblioteca = p[1].split('<')[1].split('>')[0]  # Extrai o nome do arquivo entre '<' e '>'
     p[0] = ('include', biblioteca)
 
-def p_expressao_vetor(p):
-    """expressao : ID LBRACKET expressao RBRACKET"""
-    p[0] = ('vector_access', p[1], p[3])  # nome, índice
-
-def p_expressao_matriz(p):
-    """expressao : ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET"""
-    p[0] = ('matrix_access', p[1], p[3], p[6])  # nome, índice1, índice2
-
-def p_atribuicao_vetor(p):
-    """atribuicao : ID LBRACKET expressao RBRACKET ATR expressao"""
-    p[0] = ('vector_assign', p[1], p[3], p[6])  # nome, índice, valor
-
-def p_atribuicao_matriz(p):
-    """atribuicao : ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET ATR expressao"""
-    p[0] = ('matrix_assign', p[1], p[3], p[6], p[9])  # nome, índice1, índice2, valor
 
 def p_tipo(p):
     """tipo : TIPO"""
@@ -171,8 +169,16 @@ def p_comando(p):
     p[0] = p[1]
 
 def p_atribuicao(p):
-    """atribuicao : ID ATR expressao DELIMITADOR"""
-    p[0] = ('assign', p[1], p[3])
+    """atribuicao : ID ATR expressao DELIMITADOR
+                  | ID VECTOR ATR expressao DELIMITADOR
+                  | ID MATRIX ATR expressao DELIMITADOR"""
+    if len(p) == 5:  # Atribuição simples
+        p[0] = ('assign', p[1], p[3])
+    elif len(p) == 8:  # Atribuição a vetor
+        p[0] = ('vector_assign', p[1], p[3], p[6])
+    elif len(p) == 11:  # Atribuição a matriz
+        p[0] = ('matrix_assign', p[1], p[3], p[6], p[9])
+
 
 def p_comando_condicional(p):
     """comando_condicional : IF LPAREN expressao RPAREN bloco"""
@@ -189,11 +195,19 @@ def p_expressao(p):
                  | expressao OPA expressao
                  | LPAREN expressao RPAREN
                  | ID
-                 | NUMERO"""
-    if len(p) == 4:
+                 | NUMERO
+                 | ID LBRACKET expressao RBRACKET
+                 | ID LBRACKET expressao RBRACKET LBRACKET expressao RBRACKET
+                 | PRINT LPAREN expressao RPAREN"""
+    if len(p) == 4:  # Operações como +, -, etc.
         p[0] = (p[2], p[1], p[3])
+    elif len(p) == 5:  # Acesso a vetor
+        p[0] = ('vector_access', p[1], p[3])
+    elif len(p) == 8:  # Acesso a matriz
+        p[0] = ('matrix_access', p[1], p[3], p[6])
     else:
         p[0] = p[1]
+
 
 def p_vazio(p):
     """vazio : """
@@ -297,7 +311,7 @@ def main():
         analisar_entrada(entrada)
     elif opcao == 'A':
         #arquivo = input("Digite o caminho do arquivo: ").strip()
-        arquivo = "t.c"
+        arquivo = "q.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()
