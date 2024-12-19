@@ -1,5 +1,5 @@
 import os
-from parser import analisar_entrada
+from parser_testes import analisar_entrada
 
 def gerar_codigo_intermediario(no, codigo_intermediario):
     """
@@ -20,12 +20,24 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
     
             gerar_codigo_intermediario(no[2], codigo_intermediario)
             instrucao = ('store', no[2], no[1])
-            print("Nó: ", no)
 
+        elif no[0] == 'return':  # Caso o nó seja um retorno
+            # Gera código para a expressão de retorno
+            gerar_codigo_intermediario(no[1], codigo_intermediario)
+            instrucao = ('return', no[1])  # Gera a instrução de retorno
 
         elif no[0] == 'increment':  # Caso o nó seja um incremento
-            instrucao = ('increment', no[1])  # Adiciona a variável a ser incrementada
-            codigo_intermediario.append(instrucao)    
+            # Adiciona a operação de incremento (n = n + 1)
+            instrucao = ('op', '+', no[1], 1)
+            #gerar_codigo_intermediario(no, )
+            codigo_intermediario.append(instrucao)
+            instrucao = ('store', ('+', no[1], 1), no[1])
+
+        elif no[0] == 'decrement':  # Caso o nó seja um decremento
+            # Adiciona a operação de decremento (n = n - 1)
+            instrucao = ('op', '-', no[1], 1)
+            codigo_intermediario.append(instrucao)
+            instrucao = ('store', ('-', no[1], 1), no[1])    
 
         elif no[0] in ('+', '-', '*', '/', '%', '==', '!=', '<', '>', '<=', '>=', '&&', '||'):
             # Caso o nó seja uma operação aritmética ou lógica
@@ -42,12 +54,8 @@ def gerar_codigo_intermediario(no, codigo_intermediario):
             # Itera sobre as instruções do bloco "if"
             for comando in no[2][1]:
                 gerar_codigo_intermediario(comando, bloco_codigo)
-                print("Bloco codigo: ", bloco_codigo[0])
-                print("comando: ",comando)
             # Gera a instrução do bloco condicional
             instrucao = ('if', bloco_codigo)
-            print("Bloco codigo TOTAL: ", bloco_codigo)
-            print("Instrucao: ", instrucao[1])
             
 
         elif no[0] == 'for':  # Caso o nó seja um laço "for"
@@ -139,8 +147,6 @@ def verifica_sw(mips_codigo):
                 print(f"Segundo elemento do vetor: {vetor_linha_anterior[1]}")
             else:
                 print("A linha anterior não tem um segundo elemento após a vírgula.")
-
-            print(f"HELLO WORLD: {linha_atual}")
         
         i += 1  # Incrementa o índice para continuar
     return mips_codigo
@@ -188,8 +194,6 @@ def traduzir_para_mips(codigo_intermediario):
     for instrucao in codigo_intermediario:
         #print("Instrucao: ", instrucao)
         if instrucao[0] == 'function':  # Declaração de função
-            nome_funcao = instrucao[1]
-            parametros = instrucao[2]
             corpo = instrucao[3]
             # Traduz o corpo da função
             mips_codigo.extend(traduzir_para_mips(corpo))
@@ -200,18 +204,24 @@ def traduzir_para_mips(codigo_intermediario):
             reg = registradores.get(var, novo_registrador_resultado())
             registradores[var] = reg
             mips_codigo.append(f"sw {reg}, {var} # {var2}")
+
+        elif instrucao[0] == 'return':  # Instrução de retorno
+            valor = instrucao[1]
+            reg, load_instrucao = novo_registrador(valor)
+            mips_codigo.append(load_instrucao)  # Gera instrução para carregar o valor
+            mips_codigo.append(f"move $v0, {reg}")  # Move o valor para $v0 (registrador de retorno)
+            mips_codigo.append("jr $ra")  # Retorna ao chamador
+    
         elif instrucao[0] == 'op':  # Operação aritmética ou lógica
             operador = instrucao[1]
-            print("Instrução: ", instrucao[1])
             mips_operadores = {
                 '+': 'add', '-': 'sub', '*': 'mul', '/': 'div',
                 '==': 'seq', '!=': 'sne', '<': 'slt', '>': 'sgt',
                 '<=': 'sle', '>=': 'sge'
             }
+            print("Instrucao: ", instrucao)
+            print("Operador: ", mips_operadores.get(operador))
             operacao = mips_operadores.get(operador)
-            if operacao == "mul" :
-                print("Operadores: ", operacao)
-                
             if operacao:
                 op1 = novo_registrador(instrucao[2])
                 op2 = novo_registrador(instrucao[3])
@@ -219,11 +229,26 @@ def traduzir_para_mips(codigo_intermediario):
                 mips_codigo.append(f"{op1[1]}")
                 mips_codigo.append(f"{op2[1]}")
                 mips_codigo.append(f"{operacao} {resultado}, {op1[0]}, {op2[0]}")
+
+        elif instrucao[0] == 'for':  # Laço "for"
+            bloco_for = instrucao[1]  # Bloco "for"
+            start_label = nova_label()
+            end_label = nova_label()
+
+            # Adiciona o rótulo de início do laço
+            mips_codigo.append(f"{start_label}:")
+            # Gera código para as operações do corpo do laço
+            bloco_for_traduzido = traduzir_para_mips(bloco_for)
+            mips_codigo.extend(bloco_for_traduzido)
+            # Salta de volta para o início
+            mips_codigo.append(f"j {start_label}")
+            # Adiciona o rótulo de fim do laço
+            mips_codigo.append(f"{end_label}:")
+            
         elif instrucao[0] == 'declare':  # Declaração de variáveis
             var = instrucao[2]
         elif instrucao[0] == 'if':  # Bloco condicional
             bloco_if = instrucao[1]   # Bloco "if"
-            print("Instrucao 1: ", bloco_if[0])
 
             # Criação dos labels
             label_if = nova_label()  # Label para o bloco "if"
@@ -328,7 +353,7 @@ def main():
     Função principal que lê o arquivo C, gera a árvore sintática
     e traduz para assembly MIPS, salvando o resultado em um arquivo .asm.
     """
-    entrada_c = 'basico.c'
+    entrada_c = 'teste2.c'
     try:
         with open(entrada_c, 'r') as file:
             entrada = file.read()  # Lê o código-fonte

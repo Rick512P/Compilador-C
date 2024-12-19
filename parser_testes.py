@@ -8,12 +8,13 @@ tokens = [
     'STRING', 'LIBIMPORT', 'DEFINE', 'COMENTARIO', 'BOOLEAN', 'CHAR', 'TIPO',
     'LPAREN', 'RPAREN', 'LCHAVE', 'RCHAVE', 'LBRACKET', 'ASPAS', 'RBRACKET', 'VECTOR', 'MATRIX'
 ] + list({
-    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR', 'PRINT'
+    'IF', 'ELSE', 'SWITCH', 'CASE', 'WHILE', 'DO', 'FOR', 'PRINT', 'RETURN'
 })
 
 # Palavras reservadas
 reserved = {
     'printf': 'PRINT',
+    'return': 'RETURN',
     'if': 'IF',
     'else': 'ELSE',
     'switch': 'SWITCH',
@@ -85,7 +86,6 @@ lexer = lex.lex()
 def p_programa(p):
     """programa : lista_declaracoes"""
     p[0] = ('program', p[1])
-    print("PASSANDO POR programa\n")
 
 
 
@@ -98,7 +98,6 @@ def p_lista_declaracoes(p):
     """lista_declaracoes : lista_declaracoes declaracao
                           | declaracao"""
     p[0] = p[1] + [p[2]] if len(p) == 3 else [p[1]]
-    print("PASSANDO POR lista declaracoes\n")
 
 def p_declaracao(p):
     """declaracao : declaracao_funcao
@@ -106,11 +105,11 @@ def p_declaracao(p):
                   | declaracao_preprocessador
                   | atribuicao"""
     p[0] = p[1]
-    print("PASSANDO POR declaração\n")
 
 def p_declaracao_variaveis(p):
     """declaracao_variaveis : comentario
                             | tipo lista_variaveis DELIMITADOR
+                            | tipo lista_variaveis ATR expressao DELIMITADOR
                             | tipo ID VECTOR DELIMITADOR
                             | tipo ID MATRIX DELIMITADOR
                             | tipo ID VECTOR ATR expressao DELIMITADOR
@@ -122,12 +121,10 @@ def p_declaracao_variaveis(p):
         p[0] = ('vector_declaration', p[1], p[2], p[3])
     elif len(p) == 5 and '][' in p[3]:  # Declaração de matriz
         p[0] = ('matrix_declaration', p[1], p[2], p[3])
-    print("PASSANDO POR declaracao variaveis\n")
 
 def p_declaracao_funcao(p):
     """declaracao_funcao : tipo ID LPAREN parametros RPAREN bloco
                          | tipo ID LPAREN expressao RPAREN bloco"""
-    print("PASSANDO POR declaracao funcao\n")
     p[0] = ('func_declaration', p[1], p[2], p[4], p[6])
     
 
@@ -137,25 +134,22 @@ def p_declaracao_preprocessador(p):
     # o nome do arquivo que está dentro dos sinais de menor e maior.
     biblioteca = p[1].split('<')[1].split('>')[0]  # Extrai o nome do arquivo entre '<' e '>'
     p[0] = ('include', biblioteca)
-    print("PASSANDO POR declaracao_preprocessador\n")
 
 
 def p_tipo(p):
-    """tipo : TIPO"""
+    """tipo : TIPO '*'
+            | TIPO"""
     p[0] = p[1]
-    print("PASSANDO POR tipo\n")
 
 def p_lista_variaveis(p):
     """lista_variaveis : lista_variaveis ',' ID
                         | ID"""
     p[0] = p[1] + [p[3]] if len(p) == 4 else [p[1]]
-    print("PASSANDO POR lista_variaveis\n")
 
 def p_parametros(p):
     """parametros : lista_parametros
                    | vazio"""
     p[0] = p[1]
-    print("PASSANDO POR parametros\n")
 
 def p_lista_parametros(p):
     """lista_parametros : lista_parametros DELIMITADOR tipo ID
@@ -163,20 +157,23 @@ def p_lista_parametros(p):
                          | lista_parametros DELIMITADOR tipo ID MATRIX
                          | tipo ID
                          | tipo ID VECTOR
-                         | tipo ID MATRIX"""
+                         | tipo ID MATRIX
+                         | lista_parametros DELIMITADOR tipo '*' ID
+                         | lista_parametros DELIMITADOR tipo '*' ID VECTOR
+                         | lista_parametros DELIMITADOR tipo '*' ID MATRIX
+                         | tipo '*' ID
+                         | tipo '*' ID VECTOR
+                         | tipo '*' ID MATRIX"""
     p[0] = p[1] + [(p[3], p[4])] if len(p) == 5 else [(p[1], p[2])]
-    print("PASSANDO POR lista_parametros\n")
 
 def p_bloco(p):
     """bloco : LCHAVE lista_comandos RCHAVE"""
     p[0] = ('block', p[2])
-    print("PASSANDO POR BLOCO\n")
 
 def p_lista_comandos(p):
     """lista_comandos : lista_comandos comando
                       | comando"""
     p[0] = p[1] + [p[2]] if len(p) == 3 else [p[1]]
-    print("PASSANDO POR LISTA_COMANDOS\n")
 
 def p_comando(p):
     """comando :  atribuicao
@@ -184,9 +181,18 @@ def p_comando(p):
                 | comando_loop
                 | bloco
                 | declaracao_variaveis
-                | printar"""
-    print(f"DEBUG: Regra `comando` chamada com: {p[1]}")  # Mostra o comando reconhecido
+                | printar
+                | retorno"""
     p[0] = p[1]
+
+def p_retorno(p):
+    """retorno  : RETURN expressao DELIMITADOR
+                | RETURN expressao OPA ID LPAREN expressao RPAREN DELIMITADOR"""
+    if len(p) == 4:  # Caso simples: return expressao;
+        p[0] = ('return', p[2])
+    elif len(p) == 8:  # Caso com chamada de função dentro de uma operação
+        func_call = ('call', p[4], p[6])  # ('call', nome, argumento)
+        p[0] = ('return', (p[3], p[2], func_call))  # operador, lado esquerdo, função
 
 def p_atribuicao(p):
     """atribuicao : ID ATR expressao DELIMITADOR
@@ -194,27 +200,37 @@ def p_atribuicao(p):
                   | ID MATRIX ATR expressao DELIMITADOR
                   | ID OPA OPA DELIMITADOR
                   | ID CHAR ATR ASPAS ID ASPAS"""
-    if len(p) == 5:  # Atribuição simples
+    if(p[2] == p[3] and p[2] == '+'):
+        p[0] = ('increment', p[1])  # Nó para incremento
+    elif(p[2] == p[3] and p[2] == '-'):
+        p[0] = ('decrement', p[1])  # Nó para decremento
+    elif len(p) == 5:  # Atribuição simples
         p[0] = ('assign', p[1], p[3])
     elif len(p) == 8:  # Atribuição a vetor
         p[0] = ('vector_assign', p[1], p[3], p[6])
     elif len(p) == 11:  # Atribuição a matriz
         p[0] = ('matrix_assign', p[1], p[3], p[6], p[9])
-    print("PASSANDO POR ATRIBUIÇÃO\n")
 
 
 def p_comando_condicional(p):
-    """comando_condicional : IF LPAREN expressao RPAREN bloco"""
-    print(f"Condição do IF: {p[3]}")
-    print(f"Bloco do IF: {p[5]}")
-    p[0] = ('if', p[3], p[5])
-    print("PASSANDO POR comando condicional\n")
+    """comando_condicional : IF LPAREN expressao RPAREN bloco
+                           | IF LPAREN expressao RPAREN bloco ELSE bloco
+                           | IF LPAREN expressao RPAREN comando
+                           | IF LPAREN expressao RPAREN comando ELSE comando"""
+    if len(p) == 6:  # Caso apenas 'if (...) { bloco }'
+        p[0] = ('if', p[3], p[5])
+    elif len(p) == 8:  # Caso 'if (...) { bloco } else { bloco }'
+        p[0] = ('if-else', p[3], p[5], p[7])  # Condição, bloco "if", bloco "else"
 
 def p_comando_loop(p):
     """comando_loop : DO bloco WHILE LPAREN expressao RPAREN DELIMITADOR
                     | WHILE LPAREN expressao RPAREN bloco
+                    | WHILE LPAREN expressao RPAREN expressao
                     | FOR LPAREN TIPO atribuicao expressao DELIMITADOR atribuicao RPAREN bloco
-                    | FOR LPAREN atribuicao expressao DELIMITADOR atribuicao RPAREN bloco"""
+                    | FOR LPAREN atribuicao expressao DELIMITADOR atribuicao RPAREN bloco
+                    | FOR LPAREN atribuicao expressao DELIMITADOR ID OPA OPA RPAREN bloco
+                    | FOR LPAREN atribuicao expressao DELIMITADOR ID OPA OPA RPAREN expressao
+                    | FOR LPAREN DELIMITADOR expressao DELIMITADOR ID OPA OPA RPAREN bloco"""
     if p[1] == 'do':
         # Caso 'do ... while'
         p[0] = ('do-while', p[2], p[5])  # Bloco e condição
@@ -222,17 +238,21 @@ def p_comando_loop(p):
         # Caso 'while (...) { bloco }'
         p[0] = ('while', p[3], p[5])  # Condição e bloco
     elif p[1] == 'for':
-        # Caso 'for (tipo inicialização; condição; incremento) { bloco }'
-        if len(p) == 10:  # Inclui TIPO na inicialização
-            p[0] = ('for', ('decl', p[3], p[4]), p[5], p[7], p[9])
-        # Caso 'for (inicialização; condição; incremento) { bloco }'
-        elif len(p) == 9:  # Sem TIPO na inicialização
-            p[0] = ('for', p[3], p[4], p[6], p[8])
-    print("PASSANDO POR comando loop\n")
+        
+        if len(p) == 10:  # Caso 'for (tipo inicialização; condição; incremento)'
+            if p[8] == '++':  # Incremento
+                incremento = ('increment', p[7])
+            elif p[8] == '--':  # Decremento
+                incremento = ('decrement', p[7])
+            else:  # Atribuição como incremento
+                incremento = p[7]
+            p[0] = ('for', p[3], p[5], incremento, p[9])  # Inicialização, condição, incremento, bloco
+        elif len(p) == 9:  # Caso 'for (inicialização; condição; incremento)'
+            if isinstance(p[6], tuple):  # Incremento como atribuição
+                p[0] = ('for', p[3], p[4], p[6], p[8])  # Inicialização, condição, incremento, bloco
 
 def p_printar(p):
     """printar : PRINT LPAREN expressao RPAREN DELIMITADOR"""
-    print(f"DEBUG: Regra `print` chamada com: {p[1:]}")  # Mostra os argumentos
     p[0] = ('print', p[3])
 
 
@@ -258,7 +278,6 @@ def p_expressao(p):
         p[0] = ('matrix_access', p[1], p[3], p[6])  # nome, índice1, índice2
     else:  # Casos simples (ID, NUMERO, CHAR, STRING)
         p[0] = p[1]
-    print("PASSANDO POR EXPRESSAO\n")
 
 
 def p_vazio(p):
@@ -363,7 +382,7 @@ def main():
         analisar_entrada(entrada)
     elif opcao == 'A':
         #arquivo = input("Digite o caminho do arquivo: ").strip()
-        arquivo = "q.c"
+        arquivo = "teste3.c"
         try:
             with open(arquivo, 'r') as file:
                 conteudo = file.read().strip()
