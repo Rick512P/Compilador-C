@@ -126,10 +126,14 @@ def verifica_sw(mips_codigo):
         if 'sw' in linha_atual and '(' in linha_atual:
             # Transformar linha_anterior em um vetor (lista) usando split com vírgula
             vetor_linha_atual = linha_atual.split(' (')  # Divide por vírgulas
-            vetor_linha_anterior = linha_anterior.replace(" ", "").split('$')  # Divide por vírgulas
+            vetor_linha_anterior = linha_anterior.replace(" ", "").split('$')  # Divide por vírgulas    
+            vetor_linha_anterior[1] = vetor_linha_anterior[1].replace(",", "")
             print(f"Vetor da linha anterior: {vetor_linha_anterior}")
+            
             vetor_linha_atual[1] = '$' + vetor_linha_anterior[1]
-            mips_codigo[i] = vetor_linha_atual
+            linha_atual_modificada = ' '.join(vetor_linha_atual)  # Junta os elementos com vírgula
+            
+            mips_codigo[i] = linha_atual_modificada
             print(f"Vetor linha atual: {vetor_linha_atual}")
             if len(vetor_linha_anterior) > 1:  # Garante que exista um índice 1
                 print(f"Segundo elemento do vetor: {vetor_linha_anterior[1]}")
