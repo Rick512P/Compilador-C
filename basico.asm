@@ -9,7 +9,7 @@ label_0:
     sw $t1, 1 # x
     sw $t2, n
     sw $t3, x
-    add $t4, $t2, $t3
+    mul $t4, $t2, $t3
     sw $t5, $t4
     j END
 label_1:

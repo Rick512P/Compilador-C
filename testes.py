@@ -1,5 +1,5 @@
 import os
-from parser_testes import analisar_entrada
+from parser import analisar_entrada
 
 def gerar_codigo_intermediario(no, codigo_intermediario):
     """
@@ -202,12 +202,16 @@ def traduzir_para_mips(codigo_intermediario):
             mips_codigo.append(f"sw {reg}, {var} # {var2}")
         elif instrucao[0] == 'op':  # Operação aritmética ou lógica
             operador = instrucao[1]
+            print("Instrução: ", instrucao[1])
             mips_operadores = {
                 '+': 'add', '-': 'sub', '*': 'mul', '/': 'div',
                 '==': 'seq', '!=': 'sne', '<': 'slt', '>': 'sgt',
                 '<=': 'sle', '>=': 'sge'
             }
             operacao = mips_operadores.get(operador)
+            if operacao == "mul" :
+                print("Operadores: ", operacao)
+                
             if operacao:
                 op1 = novo_registrador(instrucao[2])
                 op2 = novo_registrador(instrucao[3])

@@ -4,6 +4,6 @@ int f (int n) {
     if (x  == 0) {
         n=0;
         x=1;
-        n = n+x;
+        n = n*x;
     }
 }
